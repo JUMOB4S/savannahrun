@@ -107,6 +107,9 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
 .verdict.gagne h2 { color: var(--sauve); }
 .verdict.perdu h2 { color: var(--danger); }
 .resultats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.capture { position: fixed; inset: 0; z-index: 6; background: #000; }
+.capture.choc { animation: choc 1.6s ease-out forwards; }
+@keyframes choc { 0% { background: var(--danger); } 12% { background: #000; } 20% { background: var(--danger); } 100% { background: #000; } }
 .compte { position: fixed; inset: 0; display: grid; place-items: center; background: color-mix(in srgb, var(--nuit) 88%, transparent); font: 9rem var(--f-display); color: var(--ocre); z-index: 5; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
@@ -242,6 +245,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
 </section>
 
 <div class="compte" id="compte" hidden>3</div>
+<div class="capture" id="capture" hidden></div>
 
 <script>
 (() => {
@@ -376,6 +380,31 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     src.connect(f1).connect(g); src.connect(f2).connect(g2).connect(g); g.connect(maitre);
     src.start(t);
   }
+  // Halètement du guépard, placé à gauche ou à droite (écouteurs)
+  function souffle(volume, cote) {
+    if (!ac) return;
+    const t = ac.currentTime;
+    let sortie = maitre;
+    try { const pan = ac.createStereoPanner(); pan.pan.value = cote; pan.connect(maitre); sortie = pan; } catch {}
+    [0, 0.17].forEach((d, i) => {
+      const s = bruitBlanc(0.14), f = ac.createBiquadFilter(), g = ac.createGain();
+      f.type = 'bandpass'; f.frequency.value = i ? 750 : 1100; f.Q.value = 0.9;
+      enveloppe(g, t + d, volume, 0.02, 0.12);
+      s.connect(f).connect(g).connect(sortie); s.start(t + d);
+    });
+  }
+  // Le choc de la capture : impact sourd et violent
+  function impact() {
+    if (!ac) return;
+    const t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain();
+    o.frequency.setValueAtTime(110, t); o.frequency.exponentialRampToValueAtTime(30, t + 0.5);
+    enveloppe(g, t, 1.4, 0.005, 0.55);
+    o.connect(g).connect(maitre); o.start(t); o.stop(t + 0.6);
+    const s = bruitBlanc(0.35), f = ac.createBiquadFilter(), g2 = ac.createGain();
+    f.type = 'lowpass'; f.frequency.value = 900;
+    enveloppe(g2, t, 1, 0.003, 0.3);
+    s.connect(f).connect(g2).connect(maitre); s.start(t);
+  }
   // Ronronnement grave quand il est tout près
   function ronron() {
     if (!ac) return;
@@ -495,6 +524,11 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
         try { vent?.stop(); vent?._lfo.stop(); } catch {}
         try { gainAmb?.disconnect(); } catch {}
         vent = null; gainAmb = null;
+      },
+      silence(secondes) {
+        if (!gainAmb || !ac) return;
+        gainAmb.gain.setTargetAtTime(0.0001, ac.currentTime, 0.05);
+        minuteurs.push(setTimeout(() => { if (gainAmb) gainAmb.gain.setTargetAtTime(0.9, ac.currentTime, 0.4); }, secondes * 1000));
       },
       baisser(oui) {
         if (!gainAmb || !ac) return;
@@ -621,8 +655,15 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
   function phaseSuivante() {
     const e = etat, t = e.ecoule, v = e.vCroisiere;
     if (e.phase === 'traque') {
-      e.phase = 'alerte'; e.finPhase = t + 5;
-      sirene(); setTimeout(() => narrer('alerte'), 1200);
+      // Imprévisible : 1 attaque sur 3 sans aucun signe, sinon un signe varié et un délai variable
+      if (Math.random() < 0.35) { e.phase = 'alerte'; e.finPhase = t; return phaseSuivante(); }
+      const delai = 2 + Math.random() * 7;
+      e.phase = 'alerte'; e.finPhase = t + delai;
+      const signe = Math.random();
+      if (signe < 0.45) sirene();
+      else if (signe < 0.8) ambiance.silence(delai + 0.5);
+      else pattes();
+      setTimeout(() => narrer('alerte'), 1200);
     } else if (e.phase === 'alerte') {
       e.phase = 'attaque'; e.finPhase = t + 20 + Math.random() * 25; e.attaques++;
       feulement(0.8); setTimeout(() => narrer('attaque', true), 900);
@@ -668,10 +709,26 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
       if (ecart < 35 && Math.random() < 0.5) pattes();
       e.prochainBattement = e.ecoule + 0.35 + (Math.max(ecart, 0) / 60) * 1.1;
     }
+    // Approche finale : il halète dans votre dos, de plus en plus fort et vite
+    if (ecart < 25 && e.ecoule >= (e.prochainSouffle || 0)) {
+      if (e.cote === undefined) e.cote = Math.random() < 0.5 ? -0.6 : 0.6;
+      souffle(0.12 + (25 - Math.max(ecart, 0)) / 25 * 0.55, e.cote);
+      if (ecart < 18) pattes();
+      e.prochainSouffle = e.ecoule + 0.3 + Math.max(ecart, 0) / 25 * 0.6;
+    }
+    if (ecart > 30) e.cote = undefined;
+    // Sous 12 m, la savane se tait : il n'y a plus que lui et vous
+    if (ecart < 12 && !e.silenceFinal) { e.silenceFinal = true; ambiance.silence(120); }
+    if (ecart > 25 && e.silenceFinal) { e.silenceFinal = false; ambiance.silence(0); }
     // Tambour de chasse pendant l'attaque
     if (e.phase === 'attaque' && e.ecoule >= (e.prochainTambour || 0)) { tambour(); e.prochainTambour = e.ecoule + 0.55; }
     // Pépiement du guépard de temps en temps pendant la traque
     if (e.phase === 'traque' && Math.random() < dt / 40) pepiement();
+    // Fausses alertes : un signe d'attaque… qui n'est suivi de rien
+    if (e.phase === 'traque' && e.finPhase - e.ecoule > 15 && Math.random() < dt / 70) {
+      const f = Math.random();
+      if (f < 0.5) sirene(); else if (f < 0.8) ambiance.silence(3 + Math.random() * 3); else pattes();
+    }
     // Point régulier toutes les 2 minutes
     if (!instinct() && e.ecoule >= e.prochainPoint && e.duree - e.ecoule > 30) {
       e.prochainPoint += bavard() ? 120 : 300;
@@ -747,7 +804,16 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     ambiance.arreter();
     if (gagne === true) { appelLointain(); setTimeout(() => parler(bavard() ? 'Vous disparaissez dans les hautes herbes… Le guépard a perdu votre trace. Victoire.' : 'Victoire. Il a perdu votre trace.'), 900); }
     else if (gagne === 'survie') parler(bavard() ? "Le soleil s'est couché… Vous avez survécu. Mais il rôde encore." : 'Temps écoulé. Vous avez survécu.');
-    else if (gagne === false) { feulement(1); setTimeout(() => parler(bavard() ? 'Trop tard… Le guépard vous a eue.' : 'Attrapée.'), 1300); }
+    else if (gagne === false) {
+      // Séquence de capture : bond, choc, cri, puis un silence total où le cœur ralentit
+      try { speechSynthesis.cancel(); } catch {}
+      const cap = $('capture'); cap.hidden = false; cap.classList.remove('choc'); void cap.offsetWidth; cap.classList.add('choc');
+      feulement(1); setTimeout(impact, 250); setTimeout(() => grondement(2.4, 1), 450);
+      setTimeout(() => battement(true), 3600);
+      setTimeout(() => battement(false), 4900);
+      setTimeout(() => parler(bavard() ? 'Trop tard… Le guépard vous a eue.' : 'Attrapée.'), 6200);
+      setTimeout(() => { cap.hidden = true; }, 7000);
+    }
 
     const textes = {
       true: ['Vous avez semé le guépard', `${e.objectif} m d'avance atteints en ${mmss(e.ecoule)}. Il vous a perdue de vue.`],
@@ -768,7 +834,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     const s = lire('gazelle-stats') || { parties: 0, victoires: 0 };
     s.parties++; if (gagne === true) s.victoires++;
     ecrire('gazelle-stats', s);
-    montrer('fin');
+    if (gagne === false) setTimeout(() => montrer('fin'), 6900); else montrer('fin');
   }
 
   // ---------- Boutons ----------
