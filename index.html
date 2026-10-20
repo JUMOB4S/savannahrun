@@ -107,6 +107,16 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
 .verdict.gagne h2 { color: var(--sauve); }
 .verdict.perdu h2 { color: var(--danger); }
 .resultats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ecran-course { height: 100%; display: flex; flex-direction: column; gap: 12px; }
+#course { height: 100%; }
+.vision { position: relative; flex: 1; min-height: 320px; overflow: hidden; border-radius: 16px;
+  background: radial-gradient(120% 60% at 50% 78%, color-mix(in srgb, var(--ocre) 16%, transparent), transparent 70%), linear-gradient(#0b0805, #1f1409 72%, #2b1b0b); }
+.vision .tete { position: absolute; left: 50%; top: 63%; width: 72%; aspect-ratio: 1; max-width: none; transform: translate(-50%, -50%) scale(0.2); transform-origin: 50% 50%; will-change: transform; }
+.vision .tete svg { display: block; width: 100%; height: 100%; }
+.vision .herbes { position: absolute; left: -2%; right: -2%; bottom: 0; height: 26%; z-index: 1; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 60' preserveAspectRatio='none'%3E%3Cpath fill='%230b0704' d='M0 60 L0 34 L4 12 L7 36 L12 6 L15 34 L20 18 L23 38 L28 2 L31 36 L36 20 L40 40 L45 10 L48 36 L53 22 L57 38 L62 4 L65 34 L70 16 L73 38 L78 8 L82 36 L87 20 L90 40 L95 6 L98 34 L103 18 L107 38 L112 10 L115 36 L120 22 L120 60 Z'/%3E%3C/svg%3E") bottom / 100% 100% no-repeat, linear-gradient(transparent 55%, #0b0704 55%); }
+.vision .ecart { position: absolute; top: 12px; left: 0; right: 0; z-index: 2; text-align: center; display: grid; padding: 0; }
+.vision .ecart .val { text-shadow: 0 2px 18px #000; }
+.vision .ecart .sous { text-shadow: 0 1px 8px #000; }
 .capture { position: fixed; inset: 0; z-index: 6; background: #000; }
 .capture.choc { animation: choc 1.6s ease-out forwards; }
 @keyframes choc { 0% { background: var(--danger); } 12% { background: #000; } 20% { background: var(--danger); } 100% { background: #000; } }
@@ -194,24 +204,66 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
 </section>
 
 <section id="course" hidden>
-<main>
-  <div class="haut">
-    <span class="chrono" id="chrono">20:00</span>
-    <span class="etat" id="etat">Traque</span>
-  </div>
-  <div class="ecart">
-    <span class="val" id="ecart">60</span>
-    <span class="sous" id="sous-ecart">mètres d'avance</span>
-  </div>
-  <div class="piste" aria-hidden="true">
-    <div class="zone" id="zone"></div>
-    <span class="bete" id="b-guepard" style="left:10%">🐆</span>
-    <span class="bete" id="b-gazelle" style="left:60%">🦌</span>
-  </div>
-  <div class="stats">
-    <div class="stat"><b id="s-dist">0,00</b><span>km</span></div>
-    <div class="stat"><b id="s-allure">–:––</b><span>votre allure</span></div>
-    <div class="stat"><b id="s-guepard">–:––</b><span>guépard</span></div>
+<main class="ecran-course">
+  <div class="vision" id="vision" aria-label="Le guépard derrière vous">
+    <div class="ciel"></div>
+    <div class="tete" id="tete">
+      <svg viewBox="0 0 200 200" aria-hidden="true">
+        <defs>
+          <clipPath id="forme-tete">
+            <ellipse cx="46" cy="62" rx="15" ry="12" transform="rotate(-25 46 62)"/>
+            <ellipse cx="154" cy="62" rx="15" ry="12" transform="rotate(25 154 62)"/>
+            <ellipse cx="100" cy="104" rx="76" ry="62"/>
+            <ellipse cx="100" cy="146" rx="40" ry="30"/>
+          </clipPath>
+          <radialGradient id="pelage" cx="50%" cy="40%" r="65%">
+            <stop offset="0" stop-color="#e2b25a"/>
+            <stop offset="1" stop-color="#b47a2c"/>
+          </radialGradient>
+          <radialGradient id="iris" cx="50%" cy="45%" r="55%">
+            <stop offset="0" stop-color="#ffd76a"/>
+            <stop offset="1" stop-color="#c9861c"/>
+          </radialGradient>
+        </defs>
+        <g clip-path="url(#forme-tete)">
+          <rect width="200" height="200" fill="url(#pelage)"/>
+          <ellipse cx="46" cy="63" rx="8" ry="6" fill="#2a1a0c" transform="rotate(-25 46 63)"/>
+          <ellipse cx="154" cy="63" rx="8" ry="6" fill="#2a1a0c" transform="rotate(25 154 63)"/>
+          <ellipse cx="100" cy="150" rx="36" ry="26" fill="#f1dcae"/>
+          <ellipse cx="100" cy="128" rx="20" ry="12" fill="#f1dcae"/>
+          <g fill="#2a1a0c">
+            <circle cx="88" cy="58" r="3.2"/><circle cx="100" cy="52" r="3.6"/><circle cx="112" cy="58" r="3.2"/>
+            <circle cx="94" cy="68" r="2.6"/><circle cx="106" cy="68" r="2.6"/><circle cx="76" cy="66" r="2.8"/>
+            <circle cx="124" cy="66" r="2.8"/><circle cx="64" cy="82" r="3"/><circle cx="136" cy="82" r="3"/>
+            <circle cx="46" cy="104" r="3.4"/><circle cx="154" cy="104" r="3.4"/><circle cx="52" cy="122" r="3"/>
+            <circle cx="148" cy="122" r="3"/><circle cx="40" cy="88" r="2.6"/><circle cx="160" cy="88" r="2.6"/>
+            <circle cx="62" cy="138" r="2.4"/><circle cx="138" cy="138" r="2.4"/>
+          </g>
+          <!-- larmes noires du guépard -->
+          <path d="M82 104 C 78 118, 74 134, 80 152" stroke="#1a0f06" stroke-width="5" fill="none" stroke-linecap="round"/>
+          <path d="M118 104 C 122 118, 126 134, 120 152" stroke="#1a0f06" stroke-width="5" fill="none" stroke-linecap="round"/>
+          <path d="M88 128 L112 128 L104 140 L96 140 Z" fill="#1a0f06"/>
+          <path d="M100 140 L100 150 M100 150 Q 90 158 82 154 M100 150 Q 110 158 118 154" stroke="#1a0f06" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <!-- ombre de la nuit, plus dense quand il est loin -->
+          <rect id="ombre" width="200" height="200" fill="#120c07" opacity="0.7"/>
+        </g>
+        <!-- les yeux restent visibles même dans l'ombre -->
+        <g id="yeux">
+          <path d="M58 90 Q 78 86 93 102 Q 72 104 58 90 Z" fill="url(#iris)"/>
+          <path d="M142 90 Q 122 86 107 102 Q 128 104 142 90 Z" fill="url(#iris)"/>
+          <ellipse cx="80" cy="96" rx="3.4" ry="5" fill="#120a04"/>
+          <ellipse cx="120" cy="96" rx="3.4" ry="5" fill="#120a04"/>
+          <circle cx="82" cy="93" r="1.3" fill="#fff8e0"/>
+          <circle cx="122" cy="93" r="1.3" fill="#fff8e0"/>
+          <path d="M54 86 Q 76 78 96 98 M146 86 Q 124 78 104 98" stroke="#1a0f06" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        </g>
+      </svg>
+    </div>
+    <div class="herbes"></div>
+    <div class="ecart" id="ecart-bloc">
+      <span class="val" id="ecart">60</span>
+      <span class="sous">mètres</span>
+    </div>
   </div>
   <div class="sim" id="sim" hidden>
     <label for="vitesse">Votre vitesse simulée <span id="vitesse-val">10 km/h</span></label>
@@ -220,7 +272,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
   <p class="gps" id="gps"></p>
   <div class="actions">
     <button class="secondaire" id="pause" type="button">Pause</button>
-    <button class="secondaire" id="abandon" type="button">Abandonner</button>
+    <button class="secondaire" id="abandon" type="button">Se rendre</button>
   </div>
 </main>
 </section>
@@ -598,7 +650,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
       if (p.acc <= 30) { signalPret = true; dernierPoint = p; if (!$('attente').hidden) lancerDecompte(); }
       return;
     }
-    $('gps').textContent = `GPS ±${Math.round(p.acc)} m`;
+    $('gps').textContent = p.acc > 35 ? 'Signal GPS faible…' : '';
     if (!etat.enCours || etat.pause) { dernierPoint = p; return; }
     if (p.acc > 35) return;
     if (!dernierPoint) { dernierPoint = p; return; }
@@ -743,26 +795,28 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
   }
 
   function dessiner(ecart, vG) {
-    const e = etat;
-    $('chrono').textContent = mmss(e.duree - e.ecoule);
     const val = $('ecart');
     val.textContent = Math.max(0, Math.round(ecart));
     val.className = 'val' + (ecart < 20 ? ' danger' : ecart < 45 ? ' proche' : '');
-    const et = $('etat');
-    et.textContent = { traque: 'Traque', alerte: 'Il se prépare', attaque: 'Attaque !' }[e.phase];
-    et.className = 'etat' + (e.phase === 'traque' ? '' : ' ' + e.phase);
-    // Piste : la gazelle reste à droite, le guépard se place selon l'écart (0 m à l'objectif)
-    const pos = 85 - Math.min(Math.max(ecart, 0), e.objectif) / e.objectif * 75;
-    $('sous-ecart').textContent = `mètres d'avance · objectif ${e.objectif}`;
-    $('b-gazelle').style.left = '85%';
-    $('b-guepard').style.left = pos + '%';
-    $('zone').style.width = pos + '%';
-    $('s-dist').textContent = km(e.distance);
-    const h = e.historique, dtH = h.length > 1 ? h[h.length - 1].t - h[0].t : 0;
-    const vous = dtH > 3 ? (h[h.length - 1].d - h[0].d) / dtH : 0;
-    $('s-allure').textContent = allure(vous);
-    $('s-guepard').textContent = allure(vG);
+    vue.cible = ecart; vue.vitesse = vG || vue.vitesse;
   }
+
+  // Vision : la tête du guépard grossit à mesure qu'il approche, et bouge au rythme de sa course
+  const vue = { s: 0.2, cible: AVANCE, vitesse: 2.5 };
+  function animerVision(ts) {
+    if (!$('course').hidden) {
+      const d = Math.max(vue.cible, 0);
+      vue.s += (Math.min(2.6, 18 / (d + 6)) - vue.s) * 0.1;
+      const prox = Math.min(Math.max((80 - d) / 80, 0), 1);
+      const actif = etat.enCours && !etat.pause;
+      const periode = Math.min(Math.max(1.6 / Math.max(vue.vitesse, 0.5), 0.25), 0.7);
+      const bob = actif ? Math.sin(ts / 1000 / periode * 2 * Math.PI) * (2 + 7 * prox) : 0;
+      $('tete').style.transform = `translate(-50%, calc(-50% + ${bob.toFixed(1)}px)) scale(${vue.s.toFixed(3)})`;
+      $('ombre').setAttribute('opacity', (0.78 * (1 - prox)).toFixed(2));
+    }
+    requestAnimationFrame(animerVision);
+  }
+  requestAnimationFrame(animerVision);
 
   let horloge = null, dernierTick = 0;
   function demarrerHorloge() {
@@ -819,7 +873,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
       true: ['Vous avez semé le guépard', `${e.objectif} m d'avance atteints en ${mmss(e.ecoule)}. Il vous a perdue de vue.`],
       survie: ['Vous avez survécu', `Le chrono est fini avec ${Math.round(ecart)} m d'avance. Pour le semer, il fallait ${e.objectif} m.`],
       false: ['Le guépard vous a attrapée', `Rattrapée après ${mmss(e.ecoule)}. Gardez des forces pour ses attaques, ou choisissez un guépard moins rapide.`],
-      null: ['Poursuite abandonnée', 'Revenez quand vous voulez.'],
+      null: ['Vous vous êtes rendue', 'La gazelle a cessé de fuir. Reprenez des forces et revenez.'],
     }[String(gagne)];
     $('verdict').className = 'verdict groupe ' + (gagne === false || gagne === null ? 'perdu' : 'gagne');
     $('verdict-titre').textContent = textes[0];
@@ -868,13 +922,13 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     if (!etat.enCours) return;
     if (!etat.abandonConfirme) {
       etat.abandonConfirme = true; $('abandon').textContent = 'Confirmer ?';
-      setTimeout(() => { etat.abandonConfirme = false; $('abandon').textContent = 'Abandonner'; }, 3000);
+      setTimeout(() => { etat.abandonConfirme = false; $('abandon').textContent = 'Se rendre'; }, 3000);
       return;
     }
     terminer(null);
   });
   $('rejouer').addEventListener('click', () => {
-    $('pause').textContent = 'Pause'; $('abandon').textContent = 'Abandonner';
+    $('pause').textContent = 'Pause'; $('abandon').textContent = 'Se rendre'; vue.s = 0.2; vue.cible = AVANCE;
     afficherRecord(); montrer('accueil');
   });
 })();
