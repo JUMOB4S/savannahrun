@@ -1,0 +1,767 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Savannahrun">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a120c">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);background:#1a120c}body{margin:0}[hidden]{display:none!important}</style>
+<title>Savannahrun</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;600&display=swap">
+<style>
+/* Layout : écran unique de jeu, lisible en courant — gros chiffres, contrastes forts, une seule colonne. */
+:root {
+  --nuit: #1a120c;      /* fond : savane au crépuscule */
+  --terre: #2a1d13;     /* surfaces */
+  --sable: #f0d5a0;     /* texte principal */
+  --ocre: #e8932f;      /* accent : le pelage */
+  --poussiere: #a8917a; /* texte secondaire */
+  --danger: #ff5340;
+  --sauve: #9fd46e;
+  --f-display: "Bowlby One", "Arial Black", Impact, sans-serif;
+  --f-chiffres: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --f-texte: "Barlow", system-ui, sans-serif;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body {
+  background: var(--nuit); color: var(--sable);
+  font: 16px/1.45 var(--f-texte);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 16px;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+*, *::before, *::after { box-sizing: inherit; }
+main { max-width: 480px; margin: 0 auto; display: grid; gap: 22px; }
+h1 { font: 2.6rem/0.95 var(--f-display); margin: 0; color: var(--ocre); text-wrap: balance; letter-spacing: 0.01em; }
+h2 { font: 1.9rem/1 var(--f-display); margin: 0; text-wrap: balance; }
+.kicker { font: 600 0.8rem var(--f-chiffres); text-transform: uppercase; letter-spacing: 0.14em; color: var(--poussiere); }
+p { margin: 0; }
+.intro { color: var(--sable); max-width: 34ch; }
+.groupe { display: grid; gap: 10px; }
+.label { font: 600 0.85rem var(--f-chiffres); text-transform: uppercase; letter-spacing: 0.12em; color: var(--poussiere); }
+.choix { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.choix.deux { grid-template-columns: repeat(2, 1fr); }
+.choix button {
+  background: var(--terre); color: var(--sable); border: 2px solid transparent;
+  border-radius: 10px; padding: 12px 6px; font: 600 1.05rem var(--f-chiffres);
+  display: grid; gap: 2px; cursor: pointer; min-width: 0;
+}
+.choix button small { font: 500 0.85rem var(--f-chiffres); color: var(--poussiere); }
+.choix button[aria-pressed="true"] { border-color: var(--ocre); background: color-mix(in srgb, var(--ocre) 18%, var(--terre)); }
+button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
+.cta {
+  background: var(--ocre); color: var(--nuit); border: 0; border-radius: 12px;
+  font: 1.4rem var(--f-display); padding: 18px; cursor: pointer; width: 100%;
+}
+.cta:active { transform: scale(0.98); }
+.secondaire {
+  background: transparent; color: var(--sable); border: 2px solid var(--poussiere);
+  border-radius: 12px; font: 600 1.1rem var(--f-chiffres); padding: 12px; cursor: pointer; width: 100%;
+}
+.conseils { font-size: 0.9rem; color: var(--poussiere); display: grid; gap: 4px; padding-left: 18px; margin: 0; }
+.record { font: 600 1rem var(--f-chiffres); color: var(--poussiere); }
+
+/* Écran de course */
+#course main { gap: 18px; }
+.haut { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.chrono { font: 700 2.6rem/1 var(--f-chiffres); font-variant-numeric: tabular-nums; }
+.etat {
+  font: 700 0.95rem var(--f-chiffres); text-transform: uppercase; letter-spacing: 0.12em;
+  padding: 6px 12px; border-radius: 99px; background: var(--terre); color: var(--poussiere);
+}
+.etat.alerte { background: var(--ocre); color: var(--nuit); }
+.etat.attaque { background: var(--danger); color: var(--nuit); animation: pulse 0.6s infinite alternate; }
+@keyframes pulse { to { opacity: 0.55; } }
+.ecart { text-align: center; display: grid; gap: 0; padding-block: 8px; }
+.ecart .val { font: 2.2rem var(--f-display); font-size: clamp(4.5rem, 26vw, 7.5rem); line-height: 1; font-variant-numeric: tabular-nums; color: var(--sauve); transition: color 0.4s; }
+.ecart .val.proche { color: var(--ocre); }
+.ecart .val.danger { color: var(--danger); }
+.ecart .sous { font: 600 1rem var(--f-chiffres); text-transform: uppercase; letter-spacing: 0.14em; color: var(--poussiere); }
+.piste {
+  position: relative; height: 64px; border-radius: 12px; background:
+    repeating-linear-gradient(90deg, transparent 0 38px, color-mix(in srgb, var(--poussiere) 18%, transparent) 38px 40px),
+    var(--terre);
+  overflow: hidden;
+}
+.piste .bete { position: absolute; top: 50%; font-size: 2.2rem; transform: translate(-50%, -50%) scaleX(-1); transition: left 0.5s linear; line-height: 1; }
+.piste .zone { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, color-mix(in srgb, var(--danger) 35%, transparent), transparent); transition: width 0.5s linear; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stat { background: var(--terre); border-radius: 10px; padding: 10px; display: grid; gap: 2px; min-width: 0; }
+.stat b { font: 700 1.6rem/1 var(--f-chiffres); font-variant-numeric: tabular-nums; }
+.stat span { font: 600 0.75rem var(--f-chiffres); text-transform: uppercase; letter-spacing: 0.1em; color: var(--poussiere); }
+.sim { background: var(--terre); border-radius: 10px; padding: 12px; display: grid; gap: 8px; }
+.sim label { display: flex; justify-content: space-between; font: 600 1rem var(--f-chiffres); }
+.sim input { width: 100%; accent-color: var(--ocre); }
+.gps { font-size: 0.9rem; color: var(--poussiere); text-align: center; min-height: 1.3em; }
+.actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.bandeau { background: var(--terre); border-left: 4px solid var(--ocre); padding: 12px; border-radius: 8px; display: grid; gap: 10px; }
+
+/* Fin */
+.verdict.gagne h2 { color: var(--sauve); }
+.verdict.perdu h2 { color: var(--danger); }
+.resultats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.compte { position: fixed; inset: 0; display: grid; place-items: center; background: color-mix(in srgb, var(--nuit) 88%, transparent); font: 9rem var(--f-display); color: var(--ocre); z-index: 5; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+
+
+<section id="accueil">
+<main>
+  <header class="groupe">
+    <span class="kicker">Prototype · Mode gazelle</span>
+    <h1>Gazelle traquée</h1>
+    <p class="intro">Un guépard vous suit à la trace et alterne traque et attaques. Creusez l'écart jusqu'à l'objectif pour le semer, ou tenez jusqu'au bout du chrono.</p>
+  </header>
+
+  <div class="groupe">
+    <span class="label">Le guépard</span>
+    <div class="choix" id="choix-guepard">
+      <button type="button" id="g-1" data-allure="420" aria-pressed="false">Paresseux<small>7:00 /km</small></button>
+      <button type="button" id="g-2" data-allure="360" aria-pressed="true">Affamé<small>6:00 /km</small></button>
+      <button type="button" id="g-3" data-allure="315" aria-pressed="false">Redoutable<small>5:15 /km</small></button>
+    </div>
+  </div>
+
+  <div class="groupe">
+    <span class="label">Durée de la poursuite</span>
+    <div class="choix" id="choix-duree">
+      <button type="button" id="d-1" data-min="10" aria-pressed="false">10<small>minutes</small></button>
+      <button type="button" id="d-2" data-min="20" aria-pressed="true">20<small>minutes</small></button>
+      <button type="button" id="d-3" data-min="30" aria-pressed="false">30<small>minutes</small></button>
+    </div>
+  </div>
+
+  <div class="groupe">
+    <span class="label">Avance pour le semer</span>
+    <div class="choix" id="choix-objectif">
+      <button type="button" id="o-1" data-obj="200" aria-pressed="true">200 m<small>accessible</small></button>
+      <button type="button" id="o-2" data-obj="300" aria-pressed="false">300 m<small>costaud</small></button>
+      <button type="button" id="o-3" data-obj="500" aria-pressed="false">500 m<small>légendaire</small></button>
+    </div>
+  </div>
+
+  <div class="groupe">
+    <span class="label">Mode</span>
+    <div class="choix deux" id="choix-mode">
+      <button type="button" id="m-gps" data-mode="gps" aria-pressed="true">Course réelle<small>GPS du téléphone</small></button>
+      <button type="button" id="m-sim" data-mode="sim" aria-pressed="false">Simulation<small>tester sans courir</small></button>
+    </div>
+  </div>
+
+  <button class="cta" id="partir" type="button">Partir</button>
+  <button class="secondaire" id="ecouter" type="button">Écouter la savane</button>
+
+  <ul class="conseils">
+    <li>Montez le son et coupez le mode silencieux.</li>
+    <li>Gardez l'écran allumé, page ouverte, pendant la course.</li>
+    <li>Vous partez avec 60 m d'avance.</li>
+  </ul>
+  <p class="record" id="record"></p>
+</main>
+</section>
+
+<section id="attente" hidden>
+<main>
+  <span class="kicker">Avant le départ</span>
+  <h2>Recherche du GPS…</h2>
+  <p id="attente-txt" class="intro">Restez dehors, à découvert, quelques secondes.</p>
+  <button class="cta" id="forcer" type="button">Partir maintenant</button>
+  <button class="secondaire" id="vers-sim" type="button" hidden>Passer en simulation</button>
+  <button class="secondaire" id="annuler" type="button">Retour</button>
+</main>
+</section>
+
+<section id="course" hidden>
+<main>
+  <div class="haut">
+    <span class="chrono" id="chrono">20:00</span>
+    <span class="etat" id="etat">Traque</span>
+  </div>
+  <div class="ecart">
+    <span class="val" id="ecart">60</span>
+    <span class="sous" id="sous-ecart">mètres d'avance</span>
+  </div>
+  <div class="piste" aria-hidden="true">
+    <div class="zone" id="zone"></div>
+    <span class="bete" id="b-guepard" style="left:10%">🐆</span>
+    <span class="bete" id="b-gazelle" style="left:60%">🦌</span>
+  </div>
+  <div class="stats">
+    <div class="stat"><b id="s-dist">0,00</b><span>km</span></div>
+    <div class="stat"><b id="s-allure">–:––</b><span>votre allure</span></div>
+    <div class="stat"><b id="s-guepard">–:––</b><span>guépard</span></div>
+  </div>
+  <div class="sim" id="sim" hidden>
+    <label for="vitesse">Votre vitesse simulée <span id="vitesse-val">10 km/h</span></label>
+    <input type="range" id="vitesse" min="0" max="20" step="0.5" value="10">
+  </div>
+  <p class="gps" id="gps"></p>
+  <div class="actions">
+    <button class="secondaire" id="pause" type="button">Pause</button>
+    <button class="secondaire" id="abandon" type="button">Abandonner</button>
+  </div>
+</main>
+</section>
+
+<section id="fin" hidden>
+<main>
+  <div class="verdict groupe" id="verdict">
+    <span class="kicker">Fin de la poursuite</span>
+    <h2 id="verdict-titre">Vous avez semé le guépard</h2>
+    <p id="verdict-txt" class="intro"></p>
+  </div>
+  <div class="resultats">
+    <div class="stat"><b id="r-dist">0</b><span>km parcourus</span></div>
+    <div class="stat"><b id="r-temps">0</b><span>temps</span></div>
+    <div class="stat"><b id="r-allure">0</b><span>allure moyenne</span></div>
+    <div class="stat"><b id="r-frisson">0</b><span>plus petit écart</span></div>
+    <div class="stat"><b id="r-attaques">0</b><span>attaques subies</span></div>
+    <div class="stat"><b id="r-ecart">0</b><span>plus grande avance</span></div>
+  </div>
+  <button class="cta" id="rejouer" type="button">Rejouer</button>
+</main>
+</section>
+
+<div class="compte" id="compte" hidden>3</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const ecrans = ['accueil', 'attente', 'course', 'fin'];
+  const montrer = nom => ecrans.forEach(e => $(e).hidden = e !== nom);
+
+  // ---------- Réglages ----------
+  const reglages = { allure: 360, minutes: 20, objectif: 200, mode: 'gps' };
+  function groupe(idGroupe, cle, attr, conv) {
+    const boutons = [...$(idGroupe).querySelectorAll('button')];
+    boutons.forEach(b => b.addEventListener('click', () => {
+      boutons.forEach(x => x.setAttribute('aria-pressed', x === b));
+      reglages[cle] = conv(b.dataset[attr]);
+    }));
+  }
+  groupe('choix-guepard', 'allure', 'allure', Number);
+  groupe('choix-duree', 'minutes', 'min', Number);
+  groupe('choix-objectif', 'objectif', 'obj', Number);
+  groupe('choix-mode', 'mode', 'mode', String);
+
+  const lire = k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } };
+  const ecrire = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+  function afficherRecord() {
+    const r = lire('gazelle-stats');
+    $('record').textContent = r ? `Poursuites : ${r.parties} · semé le guépard ${r.victoires} fois` : '';
+  }
+  afficherRecord();
+
+  // ---------- Formats ----------
+  const mmss = s => { s = Math.max(0, Math.round(s)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
+  const allure = v => (v > 0.5 ? mmss(1000 / v) : '–:––'); // v en m/s -> min/km
+  const km = m => (m / 1000).toFixed(2).replace('.', ',');
+
+  // ---------- Son : voix du narrateur ----------
+  let ac = null, maitre = null, voixFr = null;
+  function choisirVoix() {
+    try {
+      const fr = speechSynthesis.getVoices().filter(v => v.lang && v.lang.startsWith('fr'));
+      // Voix grave de préférence (Thomas sur iPhone), sinon la première voix française
+      voixFr = fr.find(v => /thomas|daniel|nicolas|henri|paul/i.test(v.name)) || fr.find(v => v.lang === 'fr-FR') || fr[0] || null;
+    } catch { voixFr = null; }
+  }
+  try { choisirVoix(); speechSynthesis.onvoiceschanged = choisirVoix; } catch {}
+
+  function initSon() {
+    try {
+      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      ac.resume();
+      if (!maitre) { maitre = ac.createGain(); maitre.gain.value = 1; maitre.connect(ac.destination); }
+    } catch { ac = null; }
+    try { speechSynthesis.speak(new SpeechSynthesisUtterance('')); } catch {}
+  }
+  const auHasard = liste => liste[Math.floor(Math.random() * liste.length)];
+  // Le narrateur parle bas et lentement ; l'ambiance s'efface pendant qu'il parle.
+  function parler(txt, urgent = false) {
+    try {
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(txt);
+      u.lang = 'fr-FR'; if (voixFr) u.voice = voixFr;
+      u.pitch = urgent ? 0.85 : 0.65;
+      u.rate = urgent ? 1.05 : 0.86;
+      u.onstart = () => ambiance.baisser(true);
+      u.onend = u.onerror = () => ambiance.baisser(false);
+      speechSynthesis.speak(u);
+    } catch {}
+  }
+
+  // ---------- Son : bruitages synthétisés ----------
+  let bufferBruit = null;
+  function bruit() {
+    if (!bufferBruit) {
+      const n = ac.sampleRate * 2; bufferBruit = ac.createBuffer(1, n, ac.sampleRate);
+      const d = bufferBruit.getChannelData(0); let b = 0;
+      for (let i = 0; i < n; i++) { b = (b + 0.02 * (Math.random() * 2 - 1)) / 1.02; d[i] = b * 3.5; } // bruit brun : vent
+    }
+    const s = ac.createBufferSource(); s.buffer = bufferBruit; return s;
+  }
+  function bruitBlanc(duree) {
+    const n = Math.floor(ac.sampleRate * duree), buf = ac.createBuffer(1, n, ac.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+    const s = ac.createBufferSource(); s.buffer = buf; return s;
+  }
+  function enveloppe(g, t, pic, attaque, chute) {
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(pic, t + attaque);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + attaque + chute);
+  }
+  function battement(fort) {
+    if (!ac) return;
+    const t = ac.currentTime;
+    [0, 0.16].forEach((d, i) => {
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.frequency.value = i ? 52 : 62;
+      enveloppe(g, t + d, fort ? 0.9 : 0.5, 0.02, 0.16);
+      o.connect(g).connect(maitre); o.start(t + d); o.stop(t + d + 0.2);
+    });
+  }
+  // Grondement du fauve : bruit filtré grave, modulé comme une gorge qui vibre
+  function rugissement(duree = 1.3, volume = 1) {
+    if (!ac) return;
+    const t = ac.currentTime, src = bruitBlanc(duree);
+    const f = ac.createBiquadFilter(); f.type = 'lowpass'; f.Q.value = 7;
+    f.frequency.setValueAtTime(260, t); f.frequency.linearRampToValueAtTime(520, t + duree * 0.3); f.frequency.linearRampToValueAtTime(200, t + duree);
+    const g = ac.createGain(), lfo = ac.createOscillator(), lg = ac.createGain();
+    lfo.frequency.value = 24; lg.gain.value = 0.5 * volume; lfo.connect(lg).connect(g.gain);
+    enveloppe(g, t, volume, 0.15, duree - 0.15);
+    src.connect(f).connect(g).connect(maitre);
+    src.start(t); lfo.start(t); lfo.stop(t + duree);
+  }
+  // Ronronnement grave quand il est tout près
+  function ronron() {
+    if (!ac) return;
+    const t = ac.currentTime, src = bruitBlanc(1.4);
+    const f = ac.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 180;
+    const g = ac.createGain(), lfo = ac.createOscillator(), lg = ac.createGain();
+    lfo.frequency.value = 22; lg.gain.value = 0.6; lfo.connect(lg).connect(g.gain);
+    enveloppe(g, t, 0.9, 0.3, 1.1);
+    src.connect(f).connect(g).connect(maitre); src.start(t); lfo.start(t); lfo.stop(t + 1.4);
+  }
+  // Le vrai cri du guépard est un pépiement aigu, presque un oiseau
+  function pepiement() {
+    if (!ac) return;
+    const t = ac.currentTime;
+    [0, 0.22].forEach(d => {
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = 'triangle';
+      o.frequency.setValueAtTime(1300, t + d); o.frequency.exponentialRampToValueAtTime(2300, t + d + 0.06); o.frequency.exponentialRampToValueAtTime(1500, t + d + 0.14);
+      enveloppe(g, t + d, 0.18, 0.02, 0.13);
+      o.connect(g).connect(maitre); o.start(t + d); o.stop(t + d + 0.16);
+    });
+  }
+  // Foulées de pattes dans l'herbe sèche
+  function pattes() {
+    if (!ac) return;
+    const t = ac.currentTime;
+    [0, 0.12, 0.3, 0.42].forEach(d => {
+      const s = bruitBlanc(0.08), f = ac.createBiquadFilter(), g = ac.createGain();
+      f.type = 'bandpass'; f.frequency.value = 900 + Math.random() * 500; f.Q.value = 1.2;
+      enveloppe(g, t + d, 0.35, 0.005, 0.07);
+      s.connect(f).connect(g).connect(maitre); s.start(t + d);
+    });
+  }
+  // Tambour de chasse pendant l'attaque
+  function tambour() {
+    if (!ac) return;
+    const t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain();
+    o.frequency.setValueAtTime(140, t); o.frequency.exponentialRampToValueAtTime(55, t + 0.25);
+    enveloppe(g, t, 0.8, 0.005, 0.3);
+    o.connect(g).connect(maitre); o.start(t); o.stop(t + 0.32);
+  }
+  // Alerte : cri d'oiseau d'alarme qui s'envole
+  function sirene() {
+    if (!ac) return;
+    const t = ac.currentTime;
+    [0, 0.18, 0.36, 0.54].forEach((d, i) => {
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(2600 - i * 150, t + d); o.frequency.exponentialRampToValueAtTime(1500, t + d + 0.12);
+      enveloppe(g, t + d, 0.25, 0.01, 0.12);
+      o.connect(g).connect(maitre); o.start(t + d); o.stop(t + d + 0.15);
+    });
+    // envol : battements d'ailes
+    for (let k = 0; k < 6; k++) {
+      const s = bruitBlanc(0.06), f = ac.createBiquadFilter(), g = ac.createGain();
+      f.type = 'bandpass'; f.frequency.value = 600; f.Q.value = 0.8;
+      enveloppe(g, t + 0.7 + k * 0.08, 0.3, 0.01, 0.05);
+      s.connect(f).connect(g).connect(maitre); s.start(t + 0.7 + k * 0.08);
+    }
+  }
+  function oiseau() {
+    if (!ac) return;
+    const t = ac.currentTime, base = 1800 + Math.random() * 1600, n = 2 + Math.floor(Math.random() * 4);
+    for (let i = 0; i < n; i++) {
+      const o = ac.createOscillator(), g = ac.createGain(), d = i * 0.13;
+      o.frequency.setValueAtTime(base, t + d); o.frequency.exponentialRampToValueAtTime(base * 1.4, t + d + 0.07);
+      enveloppe(g, t + d, 0.05, 0.01, 0.08);
+      o.connect(g).connect(maitre); o.start(t + d); o.stop(t + d + 0.1);
+    }
+  }
+  // Appel lointain de gazelle / gnou : un meuglement nasal
+  function appelLointain() {
+    if (!ac) return;
+    const t = ac.currentTime, o = ac.createOscillator(), f = ac.createBiquadFilter(), g = ac.createGain();
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(190, t); o.frequency.linearRampToValueAtTime(150, t + 0.7);
+    f.type = 'bandpass'; f.frequency.value = 700; f.Q.value = 3;
+    enveloppe(g, t, 0.07, 0.1, 0.6);
+    o.connect(f).connect(g).connect(maitre); o.start(t); o.stop(t + 0.75);
+  }
+
+  // ---------- Ambiance de savane au crépuscule ----------
+  const ambiance = (() => {
+    let actif = false, gainAmb = null, vent = null, minuteurs = [];
+    function grillons() {
+      if (!actif) return;
+      const t = ac.currentTime;
+      for (let i = 0; i < 3; i++) {
+        const o = ac.createOscillator(), g = ac.createGain(), d = i * 0.05;
+        o.frequency.value = 4400;
+        enveloppe(g, t + d, 0.03, 0.005, 0.03);
+        o.connect(g).connect(gainAmb); o.start(t + d); o.stop(t + d + 0.04);
+      }
+      minuteurs.push(setTimeout(grillons, 600 + Math.random() * 500));
+    }
+    function faune() {
+      if (!actif) return;
+      auHasard([oiseau, oiseau, oiseau, appelLointain, pepiement])();
+      minuteurs.push(setTimeout(faune, 7000 + Math.random() * 12000));
+    }
+    return {
+      demarrer() {
+        if (!ac || actif) return;
+        actif = true;
+        gainAmb = ac.createGain(); gainAmb.gain.value = 0.9; gainAmb.connect(maitre);
+        vent = bruit(); vent.loop = true;
+        const f = ac.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 500;
+        const gv = ac.createGain(); gv.gain.value = 0.12;
+        const lfo = ac.createOscillator(), lg = ac.createGain();
+        lfo.frequency.value = 0.08; lg.gain.value = 0.07; lfo.connect(lg).connect(gv.gain); lfo.start();
+        vent.connect(f).connect(gv).connect(gainAmb); vent.start();
+        vent._lfo = lfo;
+        grillons(); minuteurs.push(setTimeout(faune, 3000));
+      },
+      arreter() {
+        actif = false; minuteurs.forEach(clearTimeout); minuteurs = [];
+        try { vent?.stop(); vent?._lfo.stop(); } catch {}
+        try { gainAmb?.disconnect(); } catch {}
+        vent = null; gainAmb = null;
+      },
+      baisser(oui) {
+        if (!gainAmb || !ac) return;
+        gainAmb.gain.setTargetAtTime(oui ? 0.25 : 0.9, ac.currentTime, 0.2);
+      },
+    };
+  })();
+
+  // Répliques du narrateur
+  const repliques = {
+    depart: ["La nuit tombe sur la savane… Le guépard s'éveille. Courez.", "Les hautes herbes frissonnent… Quelque chose vous suit. Courez."],
+    alerte: ["Les herbes bougent derrière vous…", "Silence… Il se ramasse sur lui-même.", "Il vous fixe. Il va bondir…"],
+    attaque: ["Il bondit ! Courez !", "La chasse est ouverte. Fuyez !", "Il fonce sur vous ! Accélérez !"],
+    repli: ["Il s'essouffle… Reprenez votre souffle.", "Il ralentit. Mais il ne vous quitte pas des yeux.", "Il retourne dans l'ombre… pour l'instant."],
+    50: ["Cinquante mètres… Vous sentez son regard sur votre nuque.", "Il est à cinquante mètres. Il ne fait plus aucun bruit."],
+    30: ["Trente mètres. Ne vous retournez pas.", "Trente mètres… Vous entendez son souffle."],
+    15: ["Quinze mètres ! Il est sur vous !", "Quinze mètres ! Ses griffes frôlent la poussière !"],
+    reste100: ["Plus que cent mètres… La savane vous ouvre la voie.", "Plus que cent mètres. Il commence à douter."],
+    reste50: ["Plus que cinquante mètres… Il perd votre trace.", "Cinquante mètres encore… Disparaissez dans les herbes."],
+  };
+
+  function testerSon() {
+    initSon();
+    ambiance.demarrer();
+    parler("La nuit tombe sur la savane… Écoutez. Il est tout près.");
+    setTimeout(pepiement, 4500);
+    setTimeout(() => rugissement(1.4), 6500);
+    setTimeout(() => ambiance.arreter(), 10000);
+  }
+
+  // ---------- Écran allumé ----------
+  let verrou = null;
+  async function garderEcran() {
+    try { verrou = await navigator.wakeLock?.request('screen'); } catch { verrou = null; }
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && etat.enCours) garderEcran();
+  });
+
+  // ---------- GPS ----------
+  let surveillance = null, dernierPoint = null, signalPret = false, attenteTimer = null;
+  const rad = x => x * Math.PI / 180;
+  function haversine(a, b) {
+    const R = 6371000, dLat = rad(b.lat - a.lat), dLon = rad(b.lon - a.lon);
+    const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLon / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(h));
+  }
+  function surPosition(pos) {
+    const p = { lat: pos.coords.latitude, lon: pos.coords.longitude, t: pos.timestamp, acc: pos.coords.accuracy };
+    if (!signalPret) {
+      $('attente-txt').textContent = `Précision : ${Math.round(p.acc)} m. On attend moins de 30 m.`;
+      if (p.acc <= 30) { signalPret = true; dernierPoint = p; if (!$('attente').hidden) lancerDecompte(); }
+      return;
+    }
+    $('gps').textContent = `GPS ±${Math.round(p.acc)} m`;
+    if (!etat.enCours || etat.pause) { dernierPoint = p; return; }
+    if (p.acc > 35) return;
+    if (!dernierPoint) { dernierPoint = p; return; }
+    const d = haversine(dernierPoint, p), dt = (p.t - dernierPoint.t) / 1000;
+    if (dt <= 0) return;
+    if (d / dt > 12) { dernierPoint = p; return; }   // saut GPS aberrant
+    if (d < 3) return;                                 // on cumule pour filtrer le bruit
+    etat.distance += d; dernierPoint = p;
+  }
+  function surErreurGps(err) {
+    if (etat.enCours) { $('gps').textContent = 'Signal GPS perdu…'; return; }
+    $('attente-txt').textContent = err && err.code === 1
+      ? "Le GPS n'est pas autorisé sur cette page. Ouvrez-la dans Safari et autorisez la localisation, ou testez en simulation."
+      : "Le GPS ne répond pas ici. Vous pouvez tester en simulation.";
+    $('vers-sim').hidden = false; $('forcer').hidden = true;
+  }
+  function demarrerGps() {
+    signalPret = false; dernierPoint = null;
+    $('vers-sim').hidden = true; $('forcer').hidden = false;
+    $('attente-txt').textContent = "Restez dehors, à découvert, quelques secondes.";
+    if (!navigator.geolocation) return surErreurGps();
+    try {
+      surveillance = navigator.geolocation.watchPosition(surPosition, surErreurGps,
+        { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 });
+    } catch { surErreurGps(); }
+    clearTimeout(attenteTimer);
+    attenteTimer = setTimeout(() => { if (!signalPret && !$('attente').hidden) surErreurGps(); }, 25000);
+  }
+  function arreterGps() {
+    if (surveillance !== null) { try { navigator.geolocation.clearWatch(surveillance); } catch {} }
+    surveillance = null; clearTimeout(attenteTimer);
+  }
+
+  // ---------- Partie ----------
+  const AVANCE = 60;
+  const DISTANCE_CAPTURE = 0; // solo : capture à 0 m (le multijoueur utilisera 10 m minimum)
+  let etat = {};
+  function nouvelleEtat() {
+    const v = 1000 / reglages.allure;
+    return {
+      enCours: false, pause: false, mode: reglages.mode,
+      duree: reglages.minutes * 60, ecoule: 0,
+      objectif: reglages.objectif, annoncesObjectif: new Set(), meilleurEcart: AVANCE,
+      distance: 0, distGuepard: -AVANCE,
+      vCroisiere: v, vGuepard: v * 0.9,
+      phase: 'traque', finPhase: 50 + Math.random() * 40,
+      attaques: 0, frisson: AVANCE, historique: [],
+      annonces: new Set(), prochainBattement: 0, prochainPoint: 120,
+      vitesseSim: Number($('vitesse').value) / 3.6, abandonConfirme: false,
+    };
+  }
+
+  function phaseSuivante() {
+    const e = etat, t = e.ecoule, v = e.vCroisiere;
+    if (e.phase === 'traque') {
+      e.phase = 'alerte'; e.finPhase = t + 5;
+      sirene(); setTimeout(() => parler(auHasard(repliques.alerte)), 1200);
+    } else if (e.phase === 'alerte') {
+      e.phase = 'attaque'; e.finPhase = t + 20 + Math.random() * 25; e.attaques++;
+      rugissement(); setTimeout(() => parler(auHasard(repliques.attaque), true), 1000);
+      e.prochainTambour = t + 1.5;
+    } else {
+      e.phase = 'traque'; e.finPhase = t + 60 + Math.random() * 60;
+      parler(auHasard(repliques.repli));
+    }
+    e.vGuepard = e.phase === 'attaque' ? v * 1.3 : v * 0.9;
+  }
+
+  function bouclePas(dt) {
+    const e = etat;
+    e.ecoule += dt;
+    if (e.ecoule >= e.finPhase) phaseSuivante();
+
+    const v = e.vGuepard;
+    e.distGuepard += v * dt;
+    if (e.mode === 'sim') e.distance += e.vitesseSim * dt;
+
+    const ecart = e.distance - e.distGuepard;
+    e.frisson = Math.min(e.frisson, ecart);
+    e.meilleurEcart = Math.max(e.meilleurEcart, ecart);
+    // Annonces de progression vers l'objectif
+    [100, 50].forEach(reste => {
+      const palier = e.objectif - reste;
+      if (palier > AVANCE && ecart >= palier && !e.annoncesObjectif.has(reste)) {
+        e.annoncesObjectif.add(reste);
+        parler(auHasard(repliques['reste' + reste]));
+      }
+    });
+    e.historique.push({ t: e.ecoule, d: e.distance });
+    while (e.historique.length && e.historique[0].t < e.ecoule - 15) e.historique.shift();
+
+    // Annonces de distance
+    [50, 30, 15].forEach(seuil => {
+      if (ecart < seuil && !e.annonces.has(seuil)) { e.annonces.add(seuil); parler(auHasard(repliques[seuil]), seuil === 15); if (seuil === 15) ronron(); }
+      if (ecart > seuil + 15) e.annonces.delete(seuil);
+    });
+    // Battements de cœur quand il se rapproche
+    if (ecart < 60 && e.ecoule >= e.prochainBattement) {
+      battement(ecart < 20);
+      if (ecart < 35 && Math.random() < 0.5) pattes();
+      e.prochainBattement = e.ecoule + 0.35 + (Math.max(ecart, 0) / 60) * 1.1;
+    }
+    // Tambour de chasse pendant l'attaque
+    if (e.phase === 'attaque' && e.ecoule >= (e.prochainTambour || 0)) { tambour(); e.prochainTambour = e.ecoule + 0.55; }
+    // Pépiement du guépard de temps en temps pendant la traque
+    if (e.phase === 'traque' && Math.random() < dt / 40) pepiement();
+    // Point régulier toutes les 2 minutes
+    if (e.ecoule >= e.prochainPoint && e.duree - e.ecoule > 30) {
+      e.prochainPoint += 120;
+      parler(`Encore ${Math.ceil((e.duree - e.ecoule) / 60)} minutes… Votre avance : ${Math.round(ecart)} mètres.`);
+    }
+
+    if (ecart <= DISTANCE_CAPTURE) return terminer(false);
+    if (ecart >= e.objectif) return terminer(true);
+    if (e.ecoule >= e.duree) return terminer('survie');
+    dessiner(ecart, v);
+  }
+
+  function dessiner(ecart, vG) {
+    const e = etat;
+    $('chrono').textContent = mmss(e.duree - e.ecoule);
+    const val = $('ecart');
+    val.textContent = Math.max(0, Math.round(ecart));
+    val.className = 'val' + (ecart < 20 ? ' danger' : ecart < 45 ? ' proche' : '');
+    const et = $('etat');
+    et.textContent = { traque: 'Traque', alerte: 'Il se prépare', attaque: 'Attaque !' }[e.phase];
+    et.className = 'etat' + (e.phase === 'traque' ? '' : ' ' + e.phase);
+    // Piste : la gazelle reste à droite, le guépard se place selon l'écart (0 m à l'objectif)
+    const pos = 85 - Math.min(Math.max(ecart, 0), e.objectif) / e.objectif * 75;
+    $('sous-ecart').textContent = `mètres d'avance · objectif ${e.objectif}`;
+    $('b-gazelle').style.left = '85%';
+    $('b-guepard').style.left = pos + '%';
+    $('zone').style.width = pos + '%';
+    $('s-dist').textContent = km(e.distance);
+    const h = e.historique, dtH = h.length > 1 ? h[h.length - 1].t - h[0].t : 0;
+    const vous = dtH > 3 ? (h[h.length - 1].d - h[0].d) / dtH : 0;
+    $('s-allure').textContent = allure(vous);
+    $('s-guepard').textContent = allure(vG);
+  }
+
+  let horloge = null, dernierTick = 0;
+  function demarrerHorloge() {
+    dernierTick = performance.now();
+    horloge = setInterval(() => {
+      const now = performance.now(), dt = Math.min((now - dernierTick) / 1000, 2);
+      dernierTick = now;
+      if (etat.enCours && !etat.pause) bouclePas(dt);
+    }, 250);
+  }
+
+  function lancerDecompte() {
+    clearTimeout(attenteTimer);
+    montrer('course');
+    $('sim').hidden = etat.mode !== 'sim';
+    $('gps').textContent = etat.mode === 'sim' ? 'Mode simulation' : '';
+    dessiner(AVANCE, 0);
+    const c = $('compte'); c.hidden = false;
+    let n = 3; c.textContent = n; parler('Trois');
+    const t = setInterval(() => {
+      n--;
+      if (n > 0) { c.textContent = n; parler(n === 2 ? 'Deux' : 'Un'); }
+      else {
+        clearInterval(t); c.hidden = true;
+        parler(auHasard(repliques.depart));
+        ambiance.demarrer();
+        setTimeout(() => rugissement(1.2, 0.6), 3500);
+        etat.enCours = true; dernierPoint = null;
+        demarrerHorloge();
+      }
+    }, 1000);
+  }
+
+  function terminer(gagne) {
+    const e = etat;
+    e.enCours = false; clearInterval(horloge); arreterGps();
+    try { verrou?.release(); } catch {}
+    const ecart = e.distance - e.distGuepard;
+    ambiance.arreter();
+    if (gagne === true) { appelLointain(); setTimeout(() => parler('Vous disparaissez dans les hautes herbes… Le guépard a perdu votre trace. Victoire.'), 900); }
+    else if (gagne === 'survie') parler("Le soleil s'est couché… Vous avez survécu. Mais il rôde encore.");
+    else if (gagne === false) { rugissement(1.8); setTimeout(() => parler('Trop tard… Le guépard vous a eue.'), 1500); }
+
+    const textes = {
+      true: ['Vous avez semé le guépard', `${e.objectif} m d'avance atteints en ${mmss(e.ecoule)}. Il vous a perdue de vue.`],
+      survie: ['Vous avez survécu', `Le chrono est fini avec ${Math.round(ecart)} m d'avance. Pour le semer, il fallait ${e.objectif} m.`],
+      false: ['Le guépard vous a attrapée', `Rattrapée après ${mmss(e.ecoule)}. Gardez des forces pour ses attaques, ou choisissez un guépard moins rapide.`],
+      null: ['Poursuite abandonnée', 'Revenez quand vous voulez.'],
+    }[String(gagne)];
+    $('verdict').className = 'verdict groupe ' + (gagne === false || gagne === null ? 'perdu' : 'gagne');
+    $('verdict-titre').textContent = textes[0];
+    $('verdict-txt').textContent = textes[1];
+    $('r-dist').textContent = km(e.distance);
+    $('r-temps').textContent = mmss(e.ecoule);
+    $('r-allure').textContent = e.ecoule > 10 ? allure(e.distance / e.ecoule) : '–:––';
+    $('r-frisson').textContent = Math.max(0, Math.round(e.frisson)) + ' m';
+    $('r-attaques').textContent = e.attaques;
+    $('r-ecart').textContent = Math.round(Math.min(e.meilleurEcart, e.objectif)) + ' m';
+
+    const s = lire('gazelle-stats') || { parties: 0, victoires: 0 };
+    s.parties++; if (gagne === true) s.victoires++;
+    ecrire('gazelle-stats', s);
+    montrer('fin');
+  }
+
+  // ---------- Boutons ----------
+  $('partir').addEventListener('click', () => {
+    initSon(); garderEcran();
+    etat = nouvelleEtat();
+    if (etat.mode === 'sim') { lancerDecompte(); return; }
+    montrer('attente'); demarrerGps();
+  });
+  $('ecouter').addEventListener('click', testerSon);
+  $('forcer').addEventListener('click', () => { signalPret = true; lancerDecompte(); });
+  $('vers-sim').addEventListener('click', () => {
+    arreterGps(); etat.mode = 'sim';
+    document.querySelectorAll('#choix-mode button').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === 'sim'));
+    reglages.mode = 'sim'; lancerDecompte();
+  });
+  $('annuler').addEventListener('click', () => { arreterGps(); montrer('accueil'); });
+  $('vitesse').addEventListener('input', ev => {
+    const kmh = Number(ev.target.value);
+    $('vitesse-val').textContent = `${String(kmh).replace('.', ',')} km/h`;
+    if (etat) etat.vitesseSim = kmh / 3.6;
+  });
+  $('pause').addEventListener('click', () => {
+    if (!etat.enCours) return;
+    etat.pause = !etat.pause;
+    $('pause').textContent = etat.pause ? 'Reprendre' : 'Pause';
+    if (etat.pause) { ambiance.arreter(); parler('Pause. La savane retient son souffle.'); }
+    else { dernierPoint = null; ambiance.demarrer(); parler('La traque reprend…'); }
+  });
+  $('abandon').addEventListener('click', () => {
+    if (!etat.enCours) return;
+    if (!etat.abandonConfirme) {
+      etat.abandonConfirme = true; $('abandon').textContent = 'Confirmer ?';
+      setTimeout(() => { etat.abandonConfirme = false; $('abandon').textContent = 'Abandonner'; }, 3000);
+      return;
+    }
+    terminer(null);
+  });
+  $('rejouer').addEventListener('click', () => {
+    $('pause').textContent = 'Pause'; $('abandon').textContent = 'Abandonner';
+    afficherRecord(); montrer('accueil');
+  });
+})();
+</script>
+
+</body>
+</html>
