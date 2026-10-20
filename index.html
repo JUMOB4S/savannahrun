@@ -716,9 +716,9 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
       const delai = 2 + Math.random() * 7;
       e.phase = 'alerte'; e.finPhase = t + delai;
       const signe = Math.random();
-      if (signe < 0.45) sirene();
-      else if (signe < 0.8) ambiance.silence(delai + 0.5);
-      else pattes();
+      if (signe < 0.5) sirene();
+      else if (signe < 0.8) pattes();
+      else pepiement();
       setTimeout(() => narrer('alerte'), 1200);
     } else if (e.phase === 'alerte') {
       // Durée d'attaque variable : sprint bref, poursuite moyenne ou longue chasse
@@ -783,7 +783,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
       e.prochainSouffle = e.ecoule + 0.3 + Math.max(ecart, 0) / 25 * 0.6;
     }
     if (ecart > 30) e.cote = undefined;
-    // Sous 12 m, la savane se tait : il n'y a plus que lui et vous
+    // Sous 12 m, la savane se tait : il n'y a plus que lui et vous (indice de proximité, pas d'attaque)
     if (ecart < 12 && !e.silenceFinal) { e.silenceFinal = true; ambiance.silence(120); }
     if (ecart > 25 && e.silenceFinal) { e.silenceFinal = false; ambiance.silence(0); }
     // Tambour de chasse pendant l'attaque
@@ -793,7 +793,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     // Fausses alertes : un signe d'attaque… qui n'est suivi de rien
     if (e.phase === 'traque' && e.finPhase - e.ecoule > 15 && Math.random() < dt / 70) {
       const f = Math.random();
-      if (f < 0.5) sirene(); else if (f < 0.8) ambiance.silence(3 + Math.random() * 3); else pattes();
+      if (f < 0.5) sirene(); else if (f < 0.8) pattes(); else pepiement();
     }
     // Point régulier toutes les 2 minutes
     if (!instinct() && e.ecoule >= e.prochainPoint && e.duree - e.ecoule > 30) {
