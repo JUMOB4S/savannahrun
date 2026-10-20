@@ -124,10 +124,11 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
 
   <div class="groupe">
     <span class="label">Le guépard</span>
-    <div class="choix" id="choix-guepard">
+    <div class="choix deux" id="choix-guepard">
       <button type="button" id="g-1" data-allure="420" aria-pressed="false">Paresseux<small>7:00 /km</small></button>
       <button type="button" id="g-2" data-allure="360" aria-pressed="true">Affamé<small>6:00 /km</small></button>
       <button type="button" id="g-3" data-allure="315" aria-pressed="false">Redoutable<small>5:15 /km</small></button>
+      <button type="button" id="g-4" data-allure="270" aria-pressed="false">Foudroyant<small>4:30 /km</small></button>
     </div>
   </div>
 
@@ -151,9 +152,10 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
 
   <div class="groupe">
     <span class="label">Narrateur</span>
-    <div class="choix deux" id="choix-narrateur">
-      <button type="button" id="n-discret" data-narr="discret" aria-pressed="true">Discret<small>l'essentiel, en bref</small></button>
-      <button type="button" id="n-bavard" data-narr="bavard" aria-pressed="false">Conteur<small>ambiance et récit</small></button>
+    <div class="choix" id="choix-narrateur">
+      <button type="button" id="n-instinct" data-narr="instinct" aria-pressed="false">Instinct<small>les sons seuls</small></button>
+      <button type="button" id="n-discret" data-narr="discret" aria-pressed="true">Discret<small>l'essentiel</small></button>
+      <button type="button" id="n-bavard" data-narr="bavard" aria-pressed="false">Conteur<small>le récit</small></button>
     </div>
   </div>
 
@@ -521,7 +523,9 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     reste100: null, reste50: ["Plus que cinquante mètres."],
   };
   const bavard = () => reglages.narrateur === 'bavard';
+  const instinct = () => reglages.narrateur === 'instinct';
   function narrer(cle, urgent = false) {
+    if (instinct()) return;
     const liste = (bavard() ? repliques : repliquesCourtes)[cle];
     if (liste) parler(auHasard(liste), urgent);
   }
@@ -669,7 +673,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     // Pépiement du guépard de temps en temps pendant la traque
     if (e.phase === 'traque' && Math.random() < dt / 40) pepiement();
     // Point régulier toutes les 2 minutes
-    if (e.ecoule >= e.prochainPoint && e.duree - e.ecoule > 30) {
+    if (!instinct() && e.ecoule >= e.prochainPoint && e.duree - e.ecoule > 30) {
       e.prochainPoint += bavard() ? 120 : 300;
       const min = Math.ceil((e.duree - e.ecoule) / 60);
       parler(bavard() ? `Encore ${min} minutes… Votre avance : ${Math.round(ecart)} mètres.` : `${min} minutes. ${Math.round(ecart)} mètres.`);
