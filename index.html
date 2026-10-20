@@ -810,13 +810,16 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
 
   function dessiner(ecart, vG) {
     const val = $('ecart');
-    val.textContent = Math.max(0, Math.round(ecart));
+    // Distance volontairement imprécise : arrondie à 10 m près
+    val.textContent = ecart < 10 ? '< 10' : Math.round(ecart / 10) * 10;
     val.className = 'val' + (ecart < 20 ? ' danger' : ecart < 45 ? ' proche' : '');
     vue.cible = ecart; vue.vitesse = vG || vue.vitesse;
     // Le guépard ne se montre qu'en attaque : pendant le répit, il rôde dans l'ombre, sans distance affichée
-    const attaque = etat.phase === 'attaque';
-    $('tete').classList.toggle('visible', attaque);
-    $('ecart-bloc').classList.toggle('cache', !attaque);
+    // Sous 30 m, il reste visible même pendant le répit (marge jusqu'à 35 m pour éviter le clignotement)
+    if (ecart < 30) etat.prochVisible = true; else if (ecart > 35) etat.prochVisible = false;
+    const montre = etat.phase === 'attaque' || etat.prochVisible;
+    $('tete').classList.toggle('visible', montre);
+    $('ecart-bloc').classList.toggle('cache', !montre);
   }
 
   // Vision : la tête du guépard grossit à mesure qu'il approche, et bouge au rythme de sa course
