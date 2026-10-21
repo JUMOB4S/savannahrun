@@ -138,6 +138,32 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
 .aide { font-size: 0.85rem; color: var(--poussiere); }
 .fichier { display: block; text-align: center; box-sizing: border-box; }
 .invisible { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+.leaflet-pane,.leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile-container,.leaflet-pane>svg,.leaflet-pane>canvas,.leaflet-zoom-box,.leaflet-image-layer,.leaflet-layer{position:absolute;left:0;top:0}
+.leaflet-container{overflow:hidden;-webkit-tap-highlight-color:transparent;background:#d9d4c7;outline:0}
+.leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow{-webkit-user-select:none;user-select:none}
+.leaflet-container img.leaflet-tile,.leaflet-container .leaflet-marker-icon{max-width:none!important;max-height:none!important;padding:0}
+.leaflet-tile{visibility:hidden}.leaflet-tile-loaded{visibility:inherit}
+.leaflet-zoom-animated{transform-origin:0 0}.leaflet-zoom-anim .leaflet-zoom-animated{transition:transform .25s cubic-bezier(0,0,.25,1)}
+.leaflet-pane{z-index:400}.leaflet-tile-pane{z-index:200}.leaflet-overlay-pane{z-index:400}.leaflet-shadow-pane{z-index:500}.leaflet-marker-pane{z-index:600}.leaflet-tooltip-pane{z-index:650}.leaflet-popup-pane{z-index:700}
+.leaflet-map-pane canvas{z-index:100}.leaflet-map-pane svg{z-index:200}
+.leaflet-top,.leaflet-bottom{position:absolute;z-index:1000;pointer-events:none}.leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}
+.leaflet-control{position:relative;z-index:800;pointer-events:auto;float:left;clear:both}.leaflet-right .leaflet-control{float:right}
+.leaflet-control-attribution{background:rgba(255,255,255,.75);font:10px/1.4 system-ui,sans-serif;padding:0 5px;color:#333}.leaflet-control-attribution a{color:#333}
+.leaflet-interactive{cursor:pointer}.leaflet-div-icon{background:transparent;border:0}
+.carte { position: absolute; inset: 0; border-radius: 16px; z-index: 0; }
+.eau-vision.avec-carte { align-content: space-between; padding: 0; overflow: hidden; }
+.eau-vision.avec-carte .fleche { display: none; }
+.eau-vision.avec-carte .carte-haut, .eau-vision.avec-carte .aide, .eau-vision.avec-carte .course-eau { position: relative; z-index: 2; }
+.eau-vision.avec-carte .carte-haut { width: 100%; padding: 10px 12px 16px; background: linear-gradient(rgba(11,8,5,.92), rgba(11,8,5,0)); }
+.eau-vision.avec-carte .course-eau { padding: 16px 12px 22px; margin: 0; background: linear-gradient(rgba(11,8,5,0), rgba(11,8,5,.92)); }
+.eau-vision.avec-carte .aide { display: none; }
+.icone-joueur { width: 44px; height: 44px; display: grid; place-items: center; }
+.icone-joueur svg { width: 44px; height: 44px; filter: drop-shadow(0 2px 4px rgba(0,0,0,.6)); }
+.icone-eau, .icone-rival { font-size: 28px; line-height: 1; text-align: center; filter: drop-shadow(0 2px 3px rgba(0,0,0,.6)); }
+.bilan-liste { display: grid; gap: 6px; margin: 4px 0 0; padding: 0; list-style: none; }
+.bilan-liste li { display: grid; grid-template-columns: 1.6em 1fr auto; gap: 8px; align-items: baseline; font-size: 0.92rem; border-top: 1px solid color-mix(in srgb, var(--poussiere) 25%, transparent); padding-top: 6px; }
+.bilan-liste .ok { color: var(--sauve); } .bilan-liste .ko { color: var(--danger); }
+.bilan-liste small { color: var(--poussiere); font-family: var(--f-chiffres); font-variant-numeric: tabular-nums; }
 #eau { height: 100%; }
 .eau-vision { position: relative; flex: 1; min-height: 320px; border-radius: 16px; display: grid; align-content: center; justify-items: center; gap: 10px; padding: 20px 16px; text-align: center;
   background: radial-gradient(90% 55% at 50% 40%, color-mix(in srgb, #3f7fa8 22%, transparent), transparent 70%), linear-gradient(#0b0805, #1f1409 72%, #2b1b0b); }
@@ -376,12 +402,15 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
 
 <section id="eau" hidden>
 <main class="ecran-course">
-  <div class="eau-vision">
-    <span class="kicker" id="eau-nom">Point d'eau</span>
+  <div class="eau-vision" id="eau-vision">
+    <div class="carte" id="carte"></div>
+    <div class="carte-haut">
+      <span class="kicker" id="eau-nom">Point d'eau</span>
+      <div class="ecart"><span class="val neutre" id="eau-dist">–</span><span class="sous">mètres</span></div>
+    </div>
     <svg class="fleche" id="fleche" viewBox="0 0 100 100" aria-hidden="true">
       <path d="M50 6 L82 70 L50 56 L18 70 Z" fill="var(--ocre)"/>
     </svg>
-    <div class="ecart"><span class="val neutre" id="eau-dist">–</span><span class="sous">mètres</span></div>
     <p class="aide" id="eau-aide"></p>
     <div class="course-eau">
       <div class="ligne-eau"><span>Vous</span><div class="piste-eau"><i id="barre-vous"></i></div></div>
@@ -412,8 +441,9 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
 
 <section id="fin" hidden>
 <main>
+  <div class="bilan-session" id="bilan-session"></div>
   <div class="verdict groupe" id="verdict">
-    <span class="kicker">Bilan · dernière partie</span>
+    <span class="kicker">Dernière partie</span>
     <h2 id="verdict-titre">Vous avez semé le guépard</h2>
     <p id="verdict-txt" class="intro"></p>
   </div>
@@ -425,7 +455,6 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     <div class="stat"><b id="r-attaques">0</b><span id="lab-attaques">attaques subies</span></div>
     <div class="stat"><b id="r-ecart">0</b><span id="lab-ecart">plus grande avance</span></div>
   </div>
-  <div class="bilan-session" id="bilan-session"></div>
   <button class="cta" id="rejouer" type="button">Retourner dans la savane</button>
   <button class="secondaire" id="accueil-btn" type="button">Changer d'animal</button>
 </main>
@@ -434,6 +463,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
 <div class="compte" id="compte" hidden>3</div>
 <div class="capture" id="capture" hidden></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 (() => {
   const $ = id => document.getElementById(id);
@@ -495,6 +525,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     $('abandon').textContent = r.abandon;
     $('lab-attaques').textContent = r.labAttaques; $('lab-ecart').textContent = r.labEcart;
     $('vision').setAttribute('aria-label', r.vision);
+    document.querySelectorAll('#choix-role small').forEach(x => { x.hidden = reglages.jeu === 'eau'; });
     Object.keys(NIVEAUX).forEach(n => { $('niv-' + n + '-txt').textContent = reglages.jeu === 'eau' ? RIVAL_TXT[n] : r.nivTxt(NIVEAUX[n].dist[reglages.role]); });
     majConseil();
     afficherRecord();
@@ -1283,11 +1314,87 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     const j = await chercherJson(`https://routing.openstreetmap.de/routed-foot/route/v1/driving/${a.lon},${a.lat};${b.lon},${b.lat}?overview=false`);
     return j.routes && j.routes[0] ? j.routes[0].distance : null;
   }
+  // ---------- Carte du Point d'eau (OpenStreetMap, fond CARTO) ----------
+  // Carte orientée nord, qui suit le joueur. La flèche du joueur pointe vers l'eau ; le rival avance sur les vraies rues.
+  let carte = null, coucheJeu = null;
+  const icone = (html, cls, taille) => L.divIcon({ html, className: cls, iconSize: [taille, taille], iconAnchor: [taille / 2, taille / 2] });
+  function preparerCarte() {
+    if (typeof L === 'undefined') { $('eau-vision').classList.remove('avec-carte'); return; }
+    $('eau-vision').classList.add('avec-carte');
+    if (!carte) {
+      carte = L.map('carte', { zoomControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false, touchZoom: false, boxZoom: false, keyboard: false });
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19, subdomains: 'abcd', attribution: '© OpenStreetMap · © CARTO',
+      }).addTo(carte);
+    }
+    if (coucheJeu) coucheJeu.remove();
+    coucheJeu = L.layerGroup().addTo(carte);
+    const e = etat;
+    e.mEau = L.marker([e.eau.lat, e.eau.lon], { icon: icone('💧', 'icone-eau', 32) }).addTo(coucheJeu);
+    e.mLigne = L.polyline([[e.pos.lat, e.pos.lon], [e.eau.lat, e.eau.lon]], { color: '#e8932f', weight: 3, dashArray: '6 8', opacity: 0.9 }).addTo(coucheJeu);
+    e.mTrace = L.polyline([], { color: '#ff5340', weight: 4, opacity: 0.6 }).addTo(coucheJeu);
+    e.mRival = L.marker([e.cheminRival[0][0], e.cheminRival[0][1]], { icon: icone(guepard() ? '🦌' : '🐆', 'icone-rival', 32) }).addTo(coucheJeu);
+    e.mJoueur = L.marker([e.pos.lat, e.pos.lon], { icon: icone('<svg viewBox="0 0 100 100" id="fleche-carte"><circle cx="50" cy="50" r="22" fill="#2b6fd6" stroke="#fff" stroke-width="6"/><path d="M50 2 L66 34 L50 27 L34 34 Z" fill="#2b6fd6" stroke="#fff" stroke-width="4"/></svg>', 'icone-joueur', 44), zIndexOffset: 1000 }).addTo(coucheJeu);
+    setTimeout(() => { carte.invalidateSize(); cadrer(true); }, 50);
+  }
+  function cadrer(immediat) {
+    const e = etat;
+    if (!carte) return;
+    const b = L.latLngBounds([[e.pos.lat, e.pos.lon], [e.eau.lat, e.eau.lon]]);
+    carte.fitBounds(b, { padding: [70, 90], maxZoom: 17, animate: !immediat });
+  }
+  function majCarte(capEau) {
+    const e = etat;
+    if (!carte || !e.mJoueur || typeof L === 'undefined') return;
+    e.mJoueur.setLatLng([e.pos.lat, e.pos.lon]);
+    const svg = document.getElementById('fleche-carte');
+    if (svg) svg.style.transform = `rotate(${capEau.toFixed(0)}deg)`;
+    e.mLigne.setLatLngs([[e.pos.lat, e.pos.lon], [e.eau.lat, e.eau.lon]]);
+    const r = positionRival(e);
+    e.mRival.setLatLng(r);
+    if (!e.prochainCadrage || e.ecoule >= e.prochainCadrage) { e.prochainCadrage = e.ecoule + 4; cadrer(false); }
+  }
+  // Position du rival le long de son chemin (vraies rues)
+  function positionRival(e) {
+    const ch = e.cheminRival, cum = e.cumulRival, d = Math.min(e.rivalFait, cum[cum.length - 1]);
+    let i = 1; while (i < cum.length - 1 && cum[i] < d) i++;
+    const f = cum[i] > cum[i - 1] ? (d - cum[i - 1]) / (cum[i] - cum[i - 1]) : 1;
+    return [ch[i - 1][0] + (ch[i][0] - ch[i - 1][0]) * f, ch[i - 1][1] + (ch[i][1] - ch[i - 1][1]) * f];
+  }
+  // Itinéraire à pied complet (géométrie) : le rival suit exactement les rues
+  async function itineraireAPied(a, b) {
+    const j = await chercherJson(`https://routing.openstreetmap.de/routed-foot/route/v1/driving/${a.lon},${a.lat};${b.lon},${b.lat}?overview=full&geometries=geojson`);
+    const r = j.routes && j.routes[0];
+    return r ? { distance: r.distance, chemin: r.geometry.coordinates.map(([lon, lat]) => [lat, lon]) } : null;
+  }
+  async function preparerRival(e) {
+    // Départ du rival : de l'autre côté de l'eau par rapport à vous, plus ou moins loin selon la difficulté
+    const capJoueur = cap(e.eau, e.depart);
+    const loin = e.depDist * RIVAL_DIST[e.niveau];
+    let iti = null;
+    for (let essai = 0; essai < 3 && !iti; essai++) {
+      const depart = destination(e.eau, capJoueur + 90 + Math.random() * 180, loin);
+      try { iti = await itineraireAPied(depart, e.eau); } catch {}
+    }
+    if (!iti) {
+      const depart = destination(e.eau, capJoueur + 180, loin);
+      iti = { distance: loin * 1.3, chemin: [[depart.lat, depart.lon], [e.eau.lat, e.eau.lon]] };
+    }
+    e.cheminRival = iti.chemin;
+    e.cumulRival = [0];
+    for (let i = 1; i < iti.chemin.length; i++) e.cumulRival.push(e.cumulRival[i - 1] + haversine({ lat: iti.chemin[i - 1][0], lon: iti.chemin[i - 1][1] }, { lat: iti.chemin[i][0], lon: iti.chemin[i][1] }));
+    // Sans vraie route, on étire la ligne droite à la longueur estimée par les rues
+    const longueur = e.cumulRival[e.cumulRival.length - 1];
+    if (iti.chemin.length === 2) e.cumulRival[1] = iti.distance;
+    e.distRival = iti.chemin.length === 2 ? iti.distance : longueur;
+  }
+
   async function preparerEau() {
     const e = etat;
     const p = profil();
     const v10 = p ? vTenable(p, 600) : 1000 / 360;           // ce que vous tenez sur 10 minutes
-    const routeVisee = v10 * 420;                              // environ 7 minutes de course
+    const NAV = 0.85;                                          // on court moins vite quand il faut s'orienter
+    const routeVisee = v10 * NAV * 420;                        // environ 7 minutes de course
     const voleOiseau = routeVisee / 1.3;                       // les rues allongent le trajet d'environ 30 %
     const pos = e.mode === 'sim' ? (dernierFix || { lat: 48.8566, lon: 2.3522 }) : (dernierFix || { lat: 48.8566, lon: 2.3522 });
     e.depart = { lat: pos.lat, lon: pos.lon }; e.pos = { ...e.depart };
@@ -1308,10 +1415,12 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     }
     e.eau = cible;
     e.routeJoueur = route || cible.d * 1.3;
-    e.distRival = e.routeJoueur * RIVAL_DIST[e.niveau];
+    e.depDist = cible.d;
+    await preparerRival(e);
     // Le rival court à ce que vous tenez sur la durée prévue, ajusté par l'apprentissage
     const k = lire(`ajust-eau-${e.niveau}`) || 1;
-    e.vRival = (p ? vTenable(p, e.distRival / v10) * 0.95 : 1000 / NIVEAUX[e.niveau].def[0]) * k;
+    // Le rival court plus lentement que ce que vous tenez : vous, vous devez lire la carte, contourner, traverser
+    e.vRival = (p ? vTenable(p, e.distRival / v10) * 0.8 : 1000 / NIVEAUX[e.niveau].def[0] * 0.85) * k;
     e.rivalFait = 0; e.depDist = cible.d; e.annoncesEau = new Set();
   }
   let dernierFix = null;
@@ -1321,6 +1430,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     $('sim-eau').hidden = etat.mode !== 'sim';
     $('eau-nom').textContent = etat.eau.hasard ? "Point d'eau" : (etat.eau.nom.charAt(0).toUpperCase() + etat.eau.nom.slice(1));
     $('eau-rival-nom').textContent = guepard() ? 'Gazelle' : 'Guépard';
+    preparerCarte();
     dessinerEau();
     const c = $('compte'); c.hidden = false;
     let n = 3; c.textContent = n; parler('Trois');
@@ -1373,6 +1483,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     const angle = e.cours === undefined ? c : c - e.cours;
     $('fleche').style.transform = `rotate(${angle.toFixed(0)}deg)`;
     $('eau-aide').textContent = e.cours === undefined ? `Direction : ${cardinal(c)}. Courez pour orienter la flèche.` : '';
+    majCarte(c);
     const pj = Math.min(1, Math.max(0, 1 - reste / e.depDist)), pr = Math.min(1, e.rivalFait / e.distRival);
     $('barre-vous').style.width = (pj * 100).toFixed(0) + '%';
     $('barre-rival').style.width = (pr * 100).toFixed(0) + '%';
@@ -1414,6 +1525,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     if (victoire || defaite) { const ca = `ajust-eau-${e.niveau}`; ecrire(ca, Math.min(1.15, Math.max(0.85, (lire(ca) || 1) * (victoire ? 1.03 : 0.97)))); }
     apprendre(e);
     session.parties++; if (victoire) session.victoires++;
+    session.liste.push({ titre: $('verdict-titre').textContent, victoire, jeu: e.jeu === 'eau' ? "Point d'eau" : 'Poursuite', role: e.role === 'guepard' ? 'Guépard' : 'Gazelle', dist: e.distance, temps: e.ecoule });
     session.dist += e.distance + e.distExplo; session.temps += e.ecoule + e.tempsExplo;
     setTimeout(lancerTransition, 1500);
   }
@@ -1472,6 +1584,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     }
     apprendre(e);
     session.parties++; if (victoire) session.victoires++;
+    session.liste.push({ titre: $('verdict-titre').textContent, victoire, jeu: e.jeu === 'eau' ? "Point d'eau" : 'Poursuite', role: e.role === 'guepard' ? 'Guépard' : 'Gazelle', dist: e.distance, temps: e.ecoule });
     session.dist += e.distance + e.distExplo; session.temps += e.ecoule + e.tempsExplo;
     const cle = e.role === 'guepard' ? 'guepard-stats' : 'gazelle-stats';
     const s = lire(cle) || { parties: 0, victoires: 0 };
@@ -1482,7 +1595,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
 
   // ---------- Boutons ----------
   // Bilan de toutes les parties enchaînées depuis l'entrée dans la savane
-  let session = { parties: 0, victoires: 0, dist: 0, temps: 0 };
+  let session = { parties: 0, victoires: 0, dist: 0, temps: 0, liste: [] };
   // Entre deux parties : 10 secondes pour sortir de la savane, sinon retour direct en exploration
   let minuteurTrans = null;
   function lancerTransition() {
@@ -1501,7 +1614,8 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     const s = session;
     $('bilan-session').innerHTML = `<span class="label">Votre passage dans la savane</span>
       <span><b>${s.parties}</b> partie${s.parties > 1 ? 's' : ''} · <b>${s.victoires}</b> victoire${s.victoires > 1 ? 's' : ''}</span>
-      <span><b>${km(s.dist)}</b> km en <b>${mmss(s.temps)}</b>${s.temps > 60 && s.dist > 100 ? ` · allure moyenne <b>${allure(s.dist / s.temps)}</b> /km` : ''}</span>`;
+      <span><b>${km(s.dist)}</b> km en <b>${mmss(s.temps)}</b>${s.temps > 60 && s.dist > 100 ? ` · allure moyenne <b>${allure(s.dist / s.temps)}</b> /km` : ''}</span>
+      <ol class="bilan-liste">${s.liste.map((p, i) => `<li><small>${i + 1}.</small><span class="${p.victoire ? 'ok' : 'ko'}">${p.titre}<br><small>${p.jeu} · ${p.role}</small></span><small>${km(p.dist)} km<br>${mmss(p.temps)}</small></li>`).join('')}</ol>`;
   }
   $('bilan-btn').addEventListener('click', () => {
     clearInterval(minuteurTrans); arreterGps();
@@ -1510,7 +1624,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
   });
 
   $('partir').addEventListener('click', () => {
-    session = { parties: 0, victoires: 0, dist: 0, temps: 0 };
+    session = { parties: 0, victoires: 0, dist: 0, temps: 0, liste: [] };
     initSon(); garderEcran();
     etat = nouvelleEtat();
     if (etat.mode === 'sim') { lancerExploration(); return; }
