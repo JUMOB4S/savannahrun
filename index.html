@@ -154,8 +154,12 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
 .eau-vision.avec-carte { align-content: space-between; padding: 0; overflow: hidden; }
 .eau-vision.avec-carte .fleche { display: none; }
 .eau-vision.avec-carte .carte-haut, .eau-vision.avec-carte .aide, .eau-vision.avec-carte .course-eau { position: relative; z-index: 2; }
-.eau-vision.avec-carte .carte-haut { width: 100%; padding: 10px 12px 16px; background: linear-gradient(rgba(11,8,5,.92), rgba(11,8,5,0)); }
-.eau-vision.avec-carte .course-eau { padding: 16px 12px 22px; margin: 0; background: linear-gradient(rgba(11,8,5,0), rgba(11,8,5,.92)); }
+.eau-vision.avec-carte .carte-haut { width: 100%; padding: 8px 12px 14px; background: linear-gradient(rgba(11,8,5,.85), rgba(11,8,5,0)); display: grid; justify-items: center; }
+.eau-vision.avec-carte .ecart { display: flex; align-items: baseline; gap: 8px; }
+.eau-vision.avec-carte .ecart .val { font-size: 2.8rem; }
+.eau-vision.avec-carte .kicker { color: var(--sable); }
+.eau-vision.avec-carte .course-eau { padding: 14px 12px 24px; margin: 0; background: linear-gradient(rgba(11,8,5,0), rgba(11,8,5,.85)); }
+.eau-vision.avec-carte .ligne-eau { color: var(--sable); }
 .eau-vision.avec-carte .aide { display: none; }
 .icone-joueur { width: 44px; height: 44px; display: grid; place-items: center; }
 .icone-joueur svg { width: 44px; height: 44px; filter: drop-shadow(0 2px 4px rgba(0,0,0,.6)); }
@@ -1323,8 +1327,9 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     $('eau-vision').classList.add('avec-carte');
     if (!carte) {
       carte = L.map('carte', { zoomControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false, touchZoom: false, boxZoom: false, keyboard: false });
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        maxZoom: 19, subdomains: 'abcd', attribution: '© OpenStreetMap · © CARTO',
+      // Fond de carte OpenStreetMap : gratuit, sans clé (attribution obligatoire)
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19, attribution: '© OpenStreetMap',
       }).addTo(carte);
     }
     if (coucheJeu) coucheJeu.remove();
@@ -1340,8 +1345,9 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
   function cadrer(immediat) {
     const e = etat;
     if (!carte) return;
-    const b = L.latLngBounds([[e.pos.lat, e.pos.lon], [e.eau.lat, e.eau.lon]]);
-    carte.fitBounds(b, { padding: [70, 90], maxZoom: 17, animate: !immediat });
+    // Le cadre garde toujours en vue : vous, l'eau et le rival
+    const b = L.latLngBounds([[e.pos.lat, e.pos.lon], [e.eau.lat, e.eau.lon], positionRival(e)]);
+    carte.fitBounds(b, { paddingTopLeft: [30, 90], paddingBottomRight: [30, 80], maxZoom: 17, animate: !immediat });
   }
   function majCarte(capEau) {
     const e = etat;
