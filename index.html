@@ -132,6 +132,19 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
 .explo-chiffres b { font: 700 2.4rem/1 var(--f-chiffres); font-variant-numeric: tabular-nums; }
 .explo-chiffres span { font: 600 0.75rem var(--f-chiffres); text-transform: uppercase; letter-spacing: 0.1em; color: var(--poussiere); }
 .cta.lancer { font-size: 1.6rem; padding: 24px; }
+.profil { background: var(--terre); border-radius: 12px; padding: 14px; }
+.profil-txt { font-size: 0.95rem; }
+.profil-txt b { font-family: var(--f-chiffres); font-size: 1.05rem; }
+.aide { font-size: 0.85rem; color: var(--poussiere); }
+.fichier { display: block; text-align: center; box-sizing: border-box; }
+.invisible { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+#transition { height: 100%; }
+.transition-ecran { height: 100%; display: grid; align-content: center; justify-items: center; text-align: center; gap: 14px; }
+.transition-ecran.gagne h2 { color: var(--sauve); }
+.transition-ecran.perdu h2 { color: var(--danger); }
+.trans-compte { font: 5rem/1 var(--f-display); color: var(--ocre); font-variant-numeric: tabular-nums; }
+.bilan-session { background: var(--terre); border-radius: 12px; padding: 14px; display: grid; gap: 6px; }
+.bilan-session b { font-family: var(--f-chiffres); font-size: 1.1rem; }
 .capture { position: fixed; inset: 0; z-index: 6; background: #000; }
 .capture.choc { animation: choc 1.6s ease-out forwards; }
 @keyframes choc { 0% { background: var(--danger); } 12% { background: #000; } 20% { background: var(--danger); } 100% { background: #000; } }
@@ -159,57 +172,43 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
   </div>
 
   <div class="groupe">
-    <span class="label" id="label-adv">Le guépard</span>
-    <div class="choix deux" id="choix-guepard">
-      <button type="button" id="g-1" data-allure="420" aria-pressed="false">Paresseux<small>7:00 /km</small></button>
-      <button type="button" id="g-2" data-allure="360" aria-pressed="true">Affamé<small>6:00 /km</small></button>
-      <button type="button" id="g-3" data-allure="315" aria-pressed="false">Redoutable<small>5:15 /km</small></button>
-      <button type="button" id="g-4" data-allure="270" aria-pressed="false">Foudroyant<small>4:30 /km</small></button>
-    </div>
-  </div>
-
-  <div class="groupe">
-    <span class="label">Durée de la poursuite</span>
-    <div class="choix" id="choix-duree">
-      <button type="button" id="d-1" data-min="10" aria-pressed="false">10<small>minutes</small></button>
-      <button type="button" id="d-2" data-min="20" aria-pressed="true">20<small>minutes</small></button>
-      <button type="button" id="d-3" data-min="30" aria-pressed="false">30<small>minutes</small></button>
-    </div>
-  </div>
-
-  <div class="groupe">
-    <span class="label" id="label-obj">Avance pour le semer</span>
-    <div class="choix" id="choix-objectif">
-      <button type="button" id="o-1" data-obj="200" aria-pressed="true">200 m<small>accessible</small></button>
-      <button type="button" id="o-2" data-obj="300" aria-pressed="false">300 m<small>costaud</small></button>
-      <button type="button" id="o-3" data-obj="500" aria-pressed="false">500 m<small>légendaire</small></button>
+    <span class="label">Difficulté</span>
+    <div class="choix" id="choix-niveau">
+      <button type="button" id="niv-facile" data-niv="facile" aria-pressed="true">Facile<small id="niv-facile-txt">semer à 50 m</small></button>
+      <button type="button" id="niv-inter" data-niv="inter" aria-pressed="false">Intermédiaire<small id="niv-inter-txt">semer à 75 m</small></button>
+      <button type="button" id="niv-legende" data-niv="legende" aria-pressed="false">Légende<small id="niv-legende-txt">semer à 100 m</small></button>
     </div>
   </div>
 
   <div class="groupe">
     <span class="label">Narrateur</span>
-    <div class="choix" id="choix-narrateur">
+    <div class="choix deux" id="choix-narrateur">
       <button type="button" id="n-instinct" data-narr="instinct" aria-pressed="false">Instinct<small>les sons seuls</small></button>
       <button type="button" id="n-discret" data-narr="discret" aria-pressed="true">Discret<small>l'essentiel</small></button>
-      <button type="button" id="n-bavard" data-narr="bavard" aria-pressed="false">Conteur<small>le récit</small></button>
     </div>
   </div>
 
   <div class="groupe">
-    <span class="label">Mode</span>
+    <span class="label">Mode (pour les tests)</span>
     <div class="choix deux" id="choix-mode">
       <button type="button" id="m-gps" data-mode="gps" aria-pressed="true">Course réelle<small>GPS du téléphone</small></button>
       <button type="button" id="m-sim" data-mode="sim" aria-pressed="false">Simulation<small>tester sans courir</small></button>
     </div>
   </div>
 
+  <div class="groupe profil">
+    <span class="label">Votre profil de coureur</span>
+    <p class="profil-txt" id="profil-txt">Première partie : l'adversaire démarre en douceur, puis apprend votre rythme partie après partie.</p>
+  </div>
+
   <button class="cta" id="partir" type="button">Partir</button>
   <button class="secondaire" id="ecouter" type="button">Écouter la savane</button>
 
   <ul class="conseils">
+    <li>Une partie dure 10 minutes au plus.</li>
     <li>Montez le son et coupez le mode silencieux.</li>
     <li>Gardez l'écran allumé, page ouverte, pendant la course.</li>
-    <li id="conseil-depart">Vous partez avec 60 m d'avance.</li>
+    <li id="conseil-depart">Vous partez avec 15 m d'avance.</li>
   </ul>
   <p class="record" id="record"></p>
 </main>
@@ -357,10 +356,21 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
 </main>
 </section>
 
+<section id="transition" hidden>
+<main class="transition-ecran" id="trans-ecran">
+  <span class="kicker">Fin de la poursuite</span>
+  <h2 id="trans-titre">Vous avez semé le guépard</h2>
+  <p class="intro" id="trans-txt"></p>
+  <span class="trans-compte" id="trans-compte">10</span>
+  <p class="aide">Retour dans la savane… La prochaine partie commencera quand vous la lancerez.</p>
+  <button class="secondaire" id="bilan-btn" type="button">Sortir de la savane et voir le bilan</button>
+</main>
+</section>
+
 <section id="fin" hidden>
 <main>
   <div class="verdict groupe" id="verdict">
-    <span class="kicker">Fin de la poursuite</span>
+    <span class="kicker">Bilan · dernière partie</span>
     <h2 id="verdict-titre">Vous avez semé le guépard</h2>
     <p id="verdict-txt" class="intro"></p>
   </div>
@@ -372,7 +382,9 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     <div class="stat"><b id="r-attaques">0</b><span id="lab-attaques">attaques subies</span></div>
     <div class="stat"><b id="r-ecart">0</b><span id="lab-ecart">plus grande avance</span></div>
   </div>
-  <button class="cta" id="rejouer" type="button">Rejouer</button>
+  <div class="bilan-session" id="bilan-session"></div>
+  <button class="cta" id="rejouer" type="button">Retourner dans la savane</button>
+  <button class="secondaire" id="accueil-btn" type="button">Changer d'animal</button>
 </main>
 </section>
 
@@ -382,12 +394,22 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
 <script>
 (() => {
   const $ = id => document.getElementById(id);
-  const ecrans = ['accueil', 'attente', 'exploration', 'course', 'fin'];
+  const ecrans = ['accueil', 'attente', 'exploration', 'course', 'transition', 'fin'];
   const montrer = nom => ecrans.forEach(e => $(e).hidden = e !== nom);
 
   // ---------- Réglages ----------
-  const reglages = { role: 'gazelle', allure: 360, minutes: 20, objectif: 200, mode: 'gps', narrateur: 'discret' };
+  const reglages = { role: 'gazelle', niveau: 'facile', minutes: 10, mode: 'gps', narrateur: 'discret' };
+  // Trois niveaux : chacun règle l'adversaire par rapport à votre propre rythme (kF au repos, kA en attaque)
+  // et fixe la distance de victoire. def = allures par défaut (s/km) tant que le jeu ne vous connaît pas.
+  const NIVEAUX = {
+    facile:  { kF: 0.92, kA: 0.95, dist: { gazelle: 50, guepard: 100 }, def: [435, 345] },
+    inter:   { kF: 1.00, kA: 1.00, dist: { gazelle: 75, guepard: 75 }, def: [375, 300] },
+    legende: { kF: 1.06, kA: 1.05, dist: { gazelle: 100, guepard: 50 }, def: [330, 260] },
+  };
+  const objectifCourant = () => NIVEAUX[reglages.niveau].dist[reglages.role];
   const guepard = () => reglages.role === 'guepard';
+  // L'écart de départ suit l'objectif (30 %) : 200 m → 60 m, 100 m → 30 m, 50 m → 15 m
+  const avancePour = obj => Math.round(obj * 0.3);
   function groupe(idGroupe, cle, attr, conv) {
     const boutons = [...$(idGroupe).querySelectorAll('button')];
     boutons.forEach(b => b.addEventListener('click', () => {
@@ -395,9 +417,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
       reglages[cle] = conv(b.dataset[attr]);
     }));
   }
-  groupe('choix-guepard', 'allure', 'allure', Number);
-  groupe('choix-duree', 'minutes', 'min', Number);
-  groupe('choix-objectif', 'objectif', 'obj', Number);
+  groupe('choix-niveau', 'niveau', 'niv', String);
   groupe('choix-mode', 'mode', 'mode', String);
   groupe('choix-narrateur', 'narrateur', 'narr', String);
   groupe('choix-role', 'role', 'role', String);
@@ -408,8 +428,8 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
       titre: 'Gazelle traquée', labelAdv: 'Le guépard', labelObj: 'Avance pour le semer',
       intro: "Un guépard vous suit à la trace et alterne traque et attaques. Creusez l'écart jusqu'à l'objectif pour le semer, ou tenez jusqu'au bout du chrono.",
       adv: ['Paresseux', 'Affamé', 'Redoutable', 'Foudroyant'],
-      obj: [[200, 'accessible'], [300, 'costaud'], [500, 'légendaire']],
-      conseil: "Vous partez avec 60 m d'avance.", abandon: 'Se rendre',
+      obj: [[50, 'accessible'], [100, 'costaud']],
+      conseil: a => `Vous partez avec ${a} m d'avance.`, abandon: 'Se rendre', nivTxt: d => `${d} m d'avance`,
       labAttaques: 'attaques subies', labEcart: 'plus grande avance', vision: 'Le guépard derrière vous',
       exploTitre: "À la recherche d'herbes fraîches", exploTxt: "Échauffez-vous à votre rythme. Personne ne vous suit… pour l'instant. Quand vous êtes prête, rejoignez la savane.", lancer: 'Rejoindre la savane',
     },
@@ -417,8 +437,8 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
       titre: 'Guépard en chasse', labelAdv: 'La proie', labelObj: "Elle s'échappe à",
       intro: "Une proie broute devant vous. Elle se méfie, et fuit sans prévenir. Rattrapez-la avant qu'elle ne creuse trop l'écart ou que la nuit tombe.",
       adv: ['Zèbre', 'Oryx', 'Impala', 'Springbok'],
-      obj: [[500, 'patiente'], [300, 'nerveuse'], [200, 'farouche']],
-      conseil: 'La proie part avec 60 m d\'avance.', abandon: 'Abandonner',
+      obj: [[100, 'patiente'], [50, 'farouche']],
+      conseil: a => `La proie part avec ${a} m d'avance.`, abandon: 'Abandonner', nivTxt: d => `fuit à ${d} m`,
       labAttaques: 'fuites de la proie', labEcart: 'plus grand écart', vision: 'La proie devant vous',
       exploTitre: 'Exploration de la savane', exploTxt: 'Rôdez à votre rythme et chauffez vos muscles. Quand vous sentez une proie, lancez la chasse.', lancer: 'Lancer la chasse',
     },
@@ -426,22 +446,16 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
   function appliquerRole() {
     const r = ROLES[reglages.role];
     $('titre').textContent = r.titre; $('intro').textContent = r.intro;
-    $('label-adv').textContent = r.labelAdv; $('label-obj').textContent = r.labelObj;
-    $('conseil-depart').textContent = r.conseil;
     $('abandon').textContent = r.abandon;
     $('lab-attaques').textContent = r.labAttaques; $('lab-ecart').textContent = r.labEcart;
     $('vision').setAttribute('aria-label', r.vision);
-    [...$('choix-guepard').querySelectorAll('button')].forEach((b, i) => {
-      b.innerHTML = `${r.adv[i]}<small>${mmss(Number(b.dataset.allure))} /km</small>`;
-    });
-    [...$('choix-objectif').querySelectorAll('button')].forEach((b, i) => {
-      b.dataset.obj = r.obj[i][0];
-      b.innerHTML = `${r.obj[i][0]} m<small>${r.obj[i][1]}</small>`;
-      if (b.getAttribute('aria-pressed') === 'true') reglages.objectif = r.obj[i][0];
-    });
+    Object.keys(NIVEAUX).forEach(n => { $('niv-' + n + '-txt').textContent = r.nivTxt(NIVEAUX[n].dist[reglages.role]); });
+    majConseil();
     afficherRecord();
   }
+  const majConseil = () => { $('conseil-depart').textContent = ROLES[reglages.role].conseil(avancePour(objectifCourant())); };
   document.querySelectorAll('#choix-role button').forEach(b => b.addEventListener('click', appliquerRole));
+  document.querySelectorAll('#choix-niveau button').forEach(b => b.addEventListener('click', majConseil));
 
   const lire = k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } };
   const ecrire = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
@@ -456,7 +470,8 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
   const mmss = s => { s = Math.max(0, Math.round(s)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
   const allure = v => (v > 0.5 ? mmss(1000 / v) : '–:––'); // v en m/s -> min/km
   const km = m => (m / 1000).toFixed(2).replace('.', ',');
-  afficherRecord();
+  appliquerRole();
+  setTimeout(afficherProfil, 0);
 
   // ---------- Son : voix du narrateur ----------
   let ac = null, maitre = null, voixFr = null;
@@ -806,6 +821,66 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     setTimeout(() => ambiance.arreter(), 10000);
   }
 
+  // ---------- Profil de coureur appris par le jeu : combien de temps vous tenez quelle allure ----------
+  // Après chaque vraie partie (GPS, au moins 3 minutes), on cherche votre meilleure allure tenue
+  // sur 30 s, 1, 3, 5 et 10 minutes. Tenir 4:45 pendant 5 min ou 12 min, ce n'est pas pareil :
+  // l'adversaire est réglé sur ce que vous tenez pour la durée de la partie et de chaque attaque.
+  // Une partie dure 10 minutes au plus : la courbe s'arrête là
+  const FENETRES = [30, 60, 180, 300, 600];
+  const profil = () => lire('profil-courbe');
+  // Allure tenable sur une durée donnée : interpolation sur votre courbe, sinon loi de Riegel (perte ~7 % par doublement)
+  function vTenable(p, sec) {
+    const pts = FENETRES.filter(w => p.courbe[w]).map(w => [w, p.courbe[w]]);
+    if (!pts.length) return null;
+    if (sec <= pts[0][0]) return pts[0][1] * Math.pow(sec / pts[0][0], -0.07);
+    const der = pts[pts.length - 1];
+    if (sec >= der[0]) return der[1] * Math.pow(sec / der[0], -0.07);
+    for (let i = 1; i < pts.length; i++) {
+      const [w0, v0] = pts[i - 1], [w1, v1] = pts[i];
+      if (sec <= w1) { const f = Math.log(sec / w0) / Math.log(w1 / w0); return Math.exp(Math.log(v0) + f * (Math.log(v1) - Math.log(v0))); }
+    }
+    return der[1];
+  }
+  function afficherProfil() {
+    const p = profil();
+    $('profil-txt').innerHTML = p
+      ? `${p.parties} partie${p.parties > 1 ? 's' : ''} analysée${p.parties > 1 ? 's' : ''} · vous tenez<br>1 min à <b>${mmss(1000 / vTenable(p, 60))}</b> · 5 min à <b>${mmss(1000 / vTenable(p, 300))}</b> · 10 min à <b>${mmss(1000 / vTenable(p, 600))}</b> /km`
+      : "Première partie : l'adversaire démarre en douceur, puis apprend votre rythme partie après partie.";
+  }
+  function meilleureVitesse(trace, w) {
+    let best = 0, j = 0;
+    for (let i = 0; i < trace.length; i++) {
+      while (j < trace.length && trace[j].t - trace[i].t < w) j++;
+      if (j >= trace.length) break;
+      best = Math.max(best, (trace[j].d - trace[i].d) / (trace[j].t - trace[i].t));
+    }
+    return best;
+  }
+  function apprendre(e) {
+    if (e.mode === 'sim' || e.ecoule < 180) return;
+    const p = profil() || { parties: 0, courbe: {} };
+    FENETRES.filter(w => w <= e.ecoule).forEach(w => {
+      const v = meilleureVitesse(e.trace, w);
+      if (v > 1.6 && v < 7.5) p.courbe[w] = p.courbe[w] ? p.courbe[w] * 0.7 + v * 0.3 : v;
+    });
+    p.parties++;
+    ecrire('profil-courbe', p);
+  }
+  // Ajustement après chaque partie, par rôle et par niveau : viser environ une victoire sur deux
+  const cleAjust = () => `ajust-${reglages.role}-${reglages.niveau}`;
+  // Rythme de fond : un peu sous ce que vous tenez sur toute la durée de la partie
+  function vitesseFond(dureePartie) {
+    const n = NIVEAUX[reglages.niveau], p = profil(), k = lire(cleAjust()) || 1;
+    const v = p ? vTenable(p, dureePartie) * 0.95 * n.kF : 1000 / n.def[0];
+    return Math.max(1.6, v) * k;
+  }
+  // Attaque / fuite : ce que vous tenez sur la durée de CETTE attaque
+  function vitesseAttaque(dureeAttaque) {
+    const n = NIVEAUX[reglages.niveau], p = profil(), k = lire(cleAjust()) || 1;
+    const v = p ? vTenable(p, dureeAttaque) * n.kA : 1000 / n.def[1];
+    return Math.max(2, v) * k;
+  }
+
   // ---------- Écran allumé ----------
   let verrou = null;
   async function garderEcran() {
@@ -872,15 +947,16 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
   const DISTANCE_CAPTURE = 0; // solo : capture à 0 m (le multijoueur utilisera 10 m minimum)
   let etat = {};
   function nouvelleEtat() {
-    const v = 1000 / reglages.allure;
+    const obj = objectifCourant(), vF = vitesseFond(reglages.minutes * 60);
     return {
       enCours: false, pause: false, mode: reglages.mode,
       duree: reglages.minutes * 60, ecoule: 0,
-      objectif: reglages.objectif, annoncesObjectif: new Set(), meilleurEcart: AVANCE,
-      role: reglages.role, distance: 0, distAdv: reglages.role === 'guepard' ? AVANCE : -AVANCE,
-      vCroisiere: v, vGuepard: v * 0.9,
+      objectif: obj, avance: avancePour(obj), annoncesObjectif: new Set(), meilleurEcart: avancePour(obj), niveau: reglages.niveau,
+      role: reglages.role, distance: 0, distAdv: (reglages.role === 'guepard' ? 1 : -1) * avancePour(obj),
+      vRepit: vF, vAtt: vitesseAttaque(30), vGuepard: vF, forme: 1, securiteJusqu: 0, trace: [],
+      fondD: 0, fondT: 0, attD: 0, attT: 0, dernDist: 0,
       phase: 'traque', finPhase: 20 + Math.random() * 100,
-      attaques: 0, frisson: AVANCE, historique: [],
+      attaques: 0, frisson: avancePour(obj), historique: [],
       annonces: new Set(), prochainBattement: 0, prochainPoint: 120,
       vitesseSim: Number($('vitesse').value) / 3.6, abandonConfirme: false,
       explo: false, distExplo: 0, tempsExplo: 0,
@@ -897,7 +973,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
   };
 
   function phaseSuivante() {
-    const e = etat, t = e.ecoule, v = e.vCroisiere;
+    const e = etat, t = e.ecoule;
     if (e.phase === 'traque') {
       // Imprévisible : 1 attaque sur 3 sans aucun signe, sinon un signe varié et un délai variable
       if (Math.random() < 0.35) { e.phase = 'alerte'; e.finPhase = t; return phaseSuivante(); }
@@ -910,6 +986,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
       const r = Math.random();
       e.dureeAttaque = r < 0.35 ? 8 + Math.random() * 7 : r < 0.8 ? 18 + Math.random() * 14 : 35 + Math.random() * 15;
       e.phase = 'attaque'; e.finPhase = t + e.dureeAttaque; e.attaques++; e.debutAttaque = t;
+      e.vAtt = vitesseAttaque(e.dureeAttaque);
       if (guepard()) sabots(0.6); else feulement(0.8);
       setTimeout(() => narrer('attaque', true), 900);
       e.prochainTambour = t + 1.5;
@@ -923,7 +1000,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
       e.phase = 'traque'; e.finPhase = t + repit;
       narrer('repli');
     }
-    e.vGuepard = e.phase === 'attaque' ? v * 1.28 : v * 0.9;
+    e.vGuepard = e.phase === 'attaque' ? e.vAtt : e.vRepit;
   }
 
   function bouclePas(dt) {
@@ -932,10 +1009,10 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     if (e.ecoule >= e.finPhase) phaseSuivante();
 
     // Départ d'attaque brutal : 4 secondes d'explosion avant de tenir le rythme
-    const v = e.phase === 'attaque' && e.ecoule - e.debutAttaque < 4 ? e.vCroisiere * 1.55 : e.vGuepard;
+    const v = (e.phase === 'attaque' ? (e.ecoule - e.debutAttaque < 4 ? e.vAtt * 1.15 : e.vAtt) : e.vRepit) * e.forme;
     e.distAdv += v * dt;
     // Mode guépard : trop près, la proie vous repère et s'enfuit plus tôt que prévu
-    if (e.role === 'guepard' && e.phase === 'traque' && calcEcart(e) < 40 && Math.random() < dt / 12) e.finPhase = e.ecoule;
+    if (e.role === 'guepard' && e.phase === 'traque' && calcEcart(e) < Math.min(40, e.avance * 1.5) && Math.random() < dt / 12) e.finPhase = e.ecoule;
     if (e.mode === 'sim') e.distance += e.vitesseSim * dt;
 
     const ecart = calcEcart(e);
@@ -944,16 +1021,20 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     // Annonces de progression vers l'objectif
     [100, 50].forEach(reste => {
       const palier = e.objectif - reste;
-      if (palier > AVANCE && ecart >= palier && !e.annoncesObjectif.has(reste)) {
+      if (palier > e.avance && ecart >= palier && !e.annoncesObjectif.has(reste)) {
         e.annoncesObjectif.add(reste);
         narrer('reste' + reste);
       }
     });
+    // Recueil : votre allure pendant les répits et pendant les attaques / fuites
+    const pas = e.distance - e.dernDist; e.dernDist = e.distance;
+    if (e.phase === 'attaque') { e.attD += pas; e.attT += dt; } else { e.fondD += pas; e.fondT += dt; }
     e.historique.push({ t: e.ecoule, d: e.distance });
-    while (e.historique.length && e.historique[0].t < e.ecoule - 15) e.historique.shift();
+    e.trace.push({ t: e.ecoule, d: e.distance });
+    while (e.historique.length && e.historique[0].t < e.ecoule - 60) e.historique.shift();
 
     // Annonces de distance
-    [50, 30, 15].forEach(seuil => {
+    [50, 30, 15].filter(seuil => seuil < e.avance).forEach(seuil => {
       if (ecart < seuil && !e.annonces.has(seuil)) { e.annonces.add(seuil); narrer(seuil, seuil === 15); if (seuil === 15 && !guepard()) ronron(); }
       if (ecart > seuil + 15) e.annonces.delete(seuil);
     });
@@ -964,16 +1045,17 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
       e.prochainBattement = e.ecoule + 0.35 + (Math.max(ecart, 0) / 60) * 1.1;
     }
     // Approche finale : il halète dans votre dos, de plus en plus fort et vite
-    if (ecart < 25 && e.ecoule >= (e.prochainSouffle || 0)) {
+    const seuilSouffle = Math.min(25, e.avance * 0.8);
+    if (ecart < seuilSouffle && e.ecoule >= (e.prochainSouffle || 0)) {
       if (e.cote === undefined) e.cote = Math.random() < 0.5 ? -0.6 : 0.6;
-      souffle(0.12 + (25 - Math.max(ecart, 0)) / 25 * 0.55, guepard() ? 0 : e.cote);
+      souffle(0.12 + (seuilSouffle - Math.max(ecart, 0)) / seuilSouffle * 0.55, guepard() ? 0 : e.cote);
       if (ecart < 18) { if (guepard()) sabots(0.25 + (18 - Math.max(ecart, 0)) / 18 * 0.4); else pattes(); }
-      e.prochainSouffle = e.ecoule + 0.3 + Math.max(ecart, 0) / 25 * 0.6;
+      e.prochainSouffle = e.ecoule + 0.3 + Math.max(ecart, 0) / seuilSouffle * 0.6;
     }
     if (ecart > 30) e.cote = undefined;
     // Sous 12 m, la savane se tait : il n'y a plus que lui et vous (indice de proximité, pas d'attaque)
-    if (ecart < 12 && !e.silenceFinal) { e.silenceFinal = true; ambiance.silence(120); }
-    if (ecart > 25 && e.silenceFinal) { e.silenceFinal = false; ambiance.silence(0); }
+    if (ecart < Math.min(12, e.avance * 0.5) && !e.silenceFinal) { e.silenceFinal = true; ambiance.silence(120); }
+    if (ecart > Math.min(25, e.avance * 0.9) && e.silenceFinal) { e.silenceFinal = false; ambiance.silence(0); }
     // Tambour de chasse pendant l'attaque
     if (e.phase === 'attaque' && e.ecoule >= (e.prochainTambour || 0)) {
       if (guepard()) { sabots(Math.max(0.15, 0.6 - ecart / 300)); e.prochainTambour = e.ecoule + 0.45; }
@@ -1010,14 +1092,16 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     // Distance volontairement imprécise : arrondie à 10 m près
     val.textContent = ecart < 10 ? '< 10' : Math.round(ecart / 10) * 10;
     val.className = etat.role === 'guepard'
-      ? 'val' + (ecart < 20 ? '' : ecart > etat.objectif - 60 ? ' danger' : ' neutre')
+      ? 'val' + (ecart < 20 ? '' : ecart > etat.objectif * 0.7 ? ' danger' : ' neutre')
       : 'val' + (ecart < 20 ? ' danger' : ecart < 45 ? ' proche' : '');
     vue.cible = ecart; vue.vitesse = vG || vue.vitesse;
     // Le guépard ne se montre qu'en attaque : pendant le répit, il rôde dans l'ombre, sans distance affichée
     // Sous 30 m, il reste visible même pendant le répit (marge jusqu'à 35 m pour éviter le clignotement)
-    if (ecart < 30) etat.prochVisible = true; else if (ecart > 35) etat.prochVisible = false;
+    const seuilVue = Math.min(30, etat.avance);
+    if (ecart < seuilVue) etat.prochVisible = true; else if (ecart > seuilVue + 5) etat.prochVisible = false;
     const montre = etat.phase === 'attaque' || etat.prochVisible;
-    vue.el().classList.toggle('visible', montre);
+    // Mode guépard : la proie reste toujours visible, toute petite au loin
+    vue.el().classList.toggle('visible', montre || etat.role === 'guepard');
     $('ecart-bloc').classList.toggle('cache', !montre);
   }
 
@@ -1090,7 +1174,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     $('tete').hidden = etat.role === 'guepard'; $('proie').hidden = etat.role !== 'guepard';
     $('tete').classList.remove('visible'); $('proie').classList.remove('visible');
     vue.s = 0.2;
-    dessiner(AVANCE, 0);
+    dessiner(etat.avance, 0);
     const c = $('compte'); c.hidden = false;
     let n = 3; c.textContent = n; parler('Trois');
     const t = setInterval(() => {
@@ -1109,8 +1193,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
 
   function terminer(issue) {
     const e = etat;
-    e.enCours = false; clearInterval(horloge); arreterGps();
-    try { verrou?.release(); } catch {}
+    e.enCours = false; clearInterval(horloge);
     const ecart = calcEcart(e);
     const capture = issue === 'attrapee' || issue === 'proie';
     const victoire = issue === 'seme' || issue === 'proie';
@@ -1153,15 +1236,53 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     $('r-attaques').textContent = e.attaques;
     $('r-ecart').textContent = Math.round(Math.min(e.meilleurEcart, e.objectif)) + ' m';
 
+    // Ajustement de l'adversaire pour la prochaine fois (environ une victoire sur deux)
+    const defaite = issue === 'attrapee' || issue === 'echappee' || issue === 'nuit';
+    if (victoire || defaite) {
+      const ca = `ajust-${e.role}-${e.niveau}`;
+      ecrire(ca, Math.min(1.15, Math.max(0.85, (lire(ca) || 1) * (victoire ? 1.03 : 0.97))));
+    }
+    apprendre(e);
+    session.parties++; if (victoire) session.victoires++;
+    session.dist += e.distance + e.distExplo; session.temps += e.ecoule + e.tempsExplo;
     const cle = e.role === 'guepard' ? 'guepard-stats' : 'gazelle-stats';
     const s = lire(cle) || { parties: 0, victoires: 0 };
     s.parties++; if (victoire) s.victoires++;
     ecrire(cle, s);
-    if (capture) setTimeout(() => montrer('fin'), 6900); else montrer('fin');
+    setTimeout(lancerTransition, capture ? 6900 : 600);
   }
 
   // ---------- Boutons ----------
+  // Bilan de toutes les parties enchaînées depuis l'entrée dans la savane
+  let session = { parties: 0, victoires: 0, dist: 0, temps: 0 };
+  // Entre deux parties : 10 secondes pour sortir de la savane, sinon retour direct en exploration
+  let minuteurTrans = null;
+  function lancerTransition() {
+    $('trans-titre').textContent = $('verdict-titre').textContent;
+    $('trans-txt').textContent = $('verdict-txt').textContent;
+    $('trans-ecran').className = 'transition-ecran ' + ($('verdict').classList.contains('gagne') ? 'gagne' : 'perdu');
+    montrer('transition');
+    let n = 10; $('trans-compte').textContent = n;
+    clearInterval(minuteurTrans);
+    minuteurTrans = setInterval(() => {
+      n--; $('trans-compte').textContent = n;
+      if (n <= 0) { clearInterval(minuteurTrans); remettreAZero(); etat = nouvelleEtat(); lancerExploration(); }
+    }, 1000);
+  }
+  function afficherBilan() {
+    const s = session;
+    $('bilan-session').innerHTML = `<span class="label">Votre passage dans la savane</span>
+      <span><b>${s.parties}</b> partie${s.parties > 1 ? 's' : ''} · <b>${s.victoires}</b> victoire${s.victoires > 1 ? 's' : ''}</span>
+      <span><b>${km(s.dist)}</b> km en <b>${mmss(s.temps)}</b>${s.temps > 60 && s.dist > 100 ? ` · allure moyenne <b>${allure(s.dist / s.temps)}</b> /km` : ''}</span>`;
+  }
+  $('bilan-btn').addEventListener('click', () => {
+    clearInterval(minuteurTrans); arreterGps();
+    try { verrou?.release(); } catch {}
+    afficherBilan(); montrer('fin');
+  });
+
   $('partir').addEventListener('click', () => {
+    session = { parties: 0, victoires: 0, dist: 0, temps: 0 };
     initSon(); garderEcran();
     etat = nouvelleEtat();
     if (etat.mode === 'sim') { lancerExploration(); return; }
@@ -1201,10 +1322,15 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     }
     terminer(etat.role === 'guepard' ? 'abandon' : 'rendue');
   });
+  const remettreAZero = () => { $('pause').textContent = 'Pause'; $('abandon').textContent = ROLES[reglages.role].abandon; vue.s = 0.2; vue.cible = 60; };
+  // Depuis le bilan : retourner dans la savane (exploration, la partie se lance quand on veut)
   $('rejouer').addEventListener('click', () => {
-    $('pause').textContent = 'Pause'; $('abandon').textContent = ROLES[reglages.role].abandon; vue.s = 0.2; vue.cible = AVANCE;
-    afficherRecord(); montrer('accueil');
+    remettreAZero(); initSon(); garderEcran();
+    etat = nouvelleEtat();
+    if (etat.mode !== 'sim') { demarrerGps(); signalPret = true; }
+    lancerExploration();
   });
+  $('accueil-btn').addEventListener('click', () => { remettreAZero(); afficherRecord(); montrer('accueil'); });
 })();
 </script>
 
