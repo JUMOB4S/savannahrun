@@ -1308,7 +1308,9 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
   // Lieux publics accessibles à pied autour de la distance visée
   async function chercherPointsEau(pos, d) {
     const R = Math.round(d * 1.3);
-    const q = `[out:json][timeout:12];(node["amenity"~"^(drinking_water|fountain)$"](around:${R},${pos.lat},${pos.lon});node["leisure"="park"](around:${R},${pos.lat},${pos.lon});way["leisure"="park"](around:${R},${pos.lat},${pos.lon}););out center 120;`;
+    // Seulement des lieux publics (pas de cour privée, de jardin réservé aux clients…)
+    const pub = '["access"!~"^(private|no|customers|permissive|delivery)$"]';
+    const q = `[out:json][timeout:12];(node["amenity"~"^(drinking_water|fountain)$"]${pub}(around:${R},${pos.lat},${pos.lon});node["leisure"="park"]${pub}(around:${R},${pos.lat},${pos.lon});way["leisure"="park"]${pub}(around:${R},${pos.lat},${pos.lon}););out center 120;`;
     const j = await chercherJson('https://overpass-api.de/api/interpreter', { method: 'POST', body: 'data=' + encodeURIComponent(q), headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
     return (j.elements || []).map(el => {
       const lat = el.lat ?? el.center?.lat, lon = el.lon ?? el.center?.lon;
@@ -1320,9 +1322,12 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
       .filter(c => c.d > d * 0.7 && c.d < d * 1.3);
   }
   // Distance réelle à pied par les rues (service de calcul d'itinéraire piéton OpenStreetMap)
-  async function distanceAPied(a, b) {
+  // Itinéraire à pied jusqu'à un lieu : distance, point d'arrivée raccroché au chemin praticable le plus proche,
+  // et écart entre le lieu et ce chemin (grand écart = lieu enclavé, inaccessible)
+  async function routeVers(a, b) {
     const j = await chercherJson(`https://routing.openstreetmap.de/routed-foot/route/v1/driving/${a.lon},${a.lat};${b.lon},${b.lat}?overview=false`);
-    return j.routes && j.routes[0] ? j.routes[0].distance : null;
+    const r = j.routes && j.routes[0], w = j.waypoints && j.waypoints[1];
+    return r && w ? { distance: r.distance, fin: { lat: w.location[1], lon: w.location[0] }, ecart: w.distance } : null;
   }
   // ---------- Carte du Point d'eau (fond OpenStreetMap) ----------
   // Carte orientée nord, qui suit le joueur. La flèche du joueur pointe vers l'eau ;
@@ -1438,18 +1443,29 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     let cible = null, route = null;
     try {
       const cands = (await chercherPointsEau(pos, voleOiseau)).sort((a, b) => b.prio - a.prio || Math.random() - 0.5);
-      for (const c of cands.slice(0, 4)) {
+      for (const c of cands.slice(0, 6)) {
         try {
-          const r = await distanceAPied(pos, c);
-          if (r && r < c.d * 1.7) { cible = c; route = r; break; }   // pas de grand détour (rivière, voie ferrée…)
+          const r = await routeVers(pos, c);
+          // Le lieu doit être à moins de 25 m d'un chemin praticable, sans grand détour (rivière, voie ferrée…)
+          if (r && r.ecart < 25 && r.distance < c.d * 1.7) { cible = { ...c, ...r.fin }; route = r.distance; break; }
         } catch {}
       }
     } catch {}
     if (!cible) {
-      // Sans réseau ou sans lieu trouvé : un point à la bonne distance, dans une direction au hasard
-      cible = { ...destination(pos, Math.random() * 360, voleOiseau), nom: "le point d'eau", hasard: true };
-      cible.d = haversine(pos, cible);
+      // Sinon : un point à la bonne distance, posé directement sur une rue ou un chemin praticable
+      for (let essai = 0; essai < 4 && !cible; essai++) {
+        const brut = destination(pos, Math.random() * 360, voleOiseau);
+        try {
+          const r = await routeVers(pos, brut);
+          if (r && r.distance < haversine(pos, r.fin) * 1.7) { cible = { ...r.fin, nom: "le point d'eau", hasard: true }; route = r.distance; }
+        } catch {}
+      }
     }
+    if (!cible) {
+      // Sans réseau : un point au hasard (non vérifié)
+      cible = { ...destination(pos, Math.random() * 360, voleOiseau), nom: "le point d'eau", hasard: true };
+    }
+    cible.d = haversine(pos, cible);
     e.eau = cible;
     e.routeJoueur = route || cible.d * 1.3;
     e.depDist = cible.d;
