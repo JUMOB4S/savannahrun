@@ -526,6 +526,10 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
   function appliquerRole() {
     const r = ROLES[reglages.role];
     $('titre').textContent = r.titre; $('intro').textContent = r.intro;
+    if (reglages.jeu === 'eau') {
+      $('titre').textContent = "La course à l'eau";
+      $('intro').textContent = "La saison sèche brûle la savane. Les animaux ont soif, et seul le plus rapide pourra boire. Soyez le premier là-bas pour vous abreuver.";
+    }
     $('abandon').textContent = r.abandon;
     $('lab-attaques').textContent = r.labAttaques; $('lab-ecart').textContent = r.labEcart;
     $('vision').setAttribute('aria-label', r.vision);
@@ -1228,6 +1232,10 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     clearTimeout(attenteTimer);
     const r = ROLES[etat.role];
     $('explo-titre').textContent = r.exploTitre; $('explo-txt').textContent = r.exploTxt;
+    if (etat.jeu === 'eau') {
+      $('explo-titre').textContent = 'La savane a soif';
+      $('explo-txt').textContent = "Échauffez-vous à votre rythme. Quand vous êtes prêt, partez vers l'eau : un rival a soif lui aussi.";
+    }
     $('lancer').textContent = etat.jeu === 'eau' ? "Partir vers l'eau" : r.lancer; $('lancer').disabled = false;
     $('sim-explo').hidden = etat.mode !== 'sim';
     $('gps-explo').textContent = etat.mode === 'sim' ? 'Mode simulation' : '';
@@ -1336,7 +1344,6 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     coucheJeu = L.layerGroup().addTo(carte);
     const e = etat;
     e.mEau = L.marker([e.eau.lat, e.eau.lon], { icon: icone('💧', 'icone-eau', 32) }).addTo(coucheJeu);
-    e.mLigne = L.polyline([[e.pos.lat, e.pos.lon], [e.eau.lat, e.eau.lon]], { color: '#e8932f', weight: 3, dashArray: '6 8', opacity: 0.9 }).addTo(coucheJeu);
     e.mTrace = L.polyline([], { color: '#ff5340', weight: 4, opacity: 0.6 }).addTo(coucheJeu);
     e.mRival = L.marker([e.cheminRival[0][0], e.cheminRival[0][1]], { icon: icone(guepard() ? '🦌' : '🐆', 'icone-rival', 32) }).addTo(coucheJeu);
     e.mJoueur = L.marker([e.pos.lat, e.pos.lon], { icon: icone('<svg viewBox="0 0 100 100" id="fleche-carte"><circle cx="50" cy="50" r="22" fill="#2b6fd6" stroke="#fff" stroke-width="6"/><path d="M50 2 L66 34 L50 27 L34 34 Z" fill="#2b6fd6" stroke="#fff" stroke-width="4"/></svg>', 'icone-joueur', 44), zIndexOffset: 1000 }).addTo(coucheJeu);
@@ -1355,7 +1362,6 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     e.mJoueur.setLatLng([e.pos.lat, e.pos.lon]);
     const svg = document.getElementById('fleche-carte');
     if (svg) svg.style.transform = `rotate(${capEau.toFixed(0)}deg)`;
-    e.mLigne.setLatLngs([[e.pos.lat, e.pos.lon], [e.eau.lat, e.eau.lon]]);
     const r = positionRival(e);
     e.mRival.setLatLng(r);
     if (!e.prochainCadrage || e.ecoule >= e.prochainCadrage) { e.prochainCadrage = e.ecoule + 4; cadrer(false); }
