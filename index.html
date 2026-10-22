@@ -185,6 +185,41 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
 .trans-compte { font: 5rem/1 var(--f-display); color: var(--ocre); font-variant-numeric: tabular-nums; }
 .bilan-session { background: var(--terre); border-radius: 12px; padding: 14px; display: grid; gap: 6px; }
 .bilan-session b { font-family: var(--f-chiffres); font-size: 1.1rem; }
+/* Décor savane */
+.hero { position: relative; height: 230px; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,.45); }
+.hero .paysage { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.hero-titre { position: absolute; inset: 22px 0 auto; display: grid; justify-items: center; gap: 4px; text-align: center; }
+.logo { font: 2.5rem/1 var(--f-display); color: #fff0cf; letter-spacing: 0.01em; text-shadow: 0 2px 14px rgba(70,10,0,.55); }
+.slogan { font: 600 0.85rem var(--f-chiffres); text-transform: uppercase; letter-spacing: 0.32em; color: #ffe2a8; text-shadow: 0 1px 8px rgba(70,10,0,.6); }
+.oiseaux { animation: vol 18s ease-in-out infinite alternate; }
+@keyframes vol { from { transform: translate(0, 0); } to { transform: translate(60px, -10px); } }
+.soleil { animation: lueur 6s ease-in-out infinite alternate; }
+@keyframes lueur { from { opacity: 0.9; } to { opacity: 1; } }
+.mode h1 { font-size: 2rem; }
+.pitch { display: grid; gap: 12px; }
+.pitch-phrase { font: 600 1.15rem/1.35 var(--f-texte); color: var(--sable); text-align: center; text-wrap: balance; margin: 0; }
+.pitch-points { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.pitch-points sup { line-height: 0; }
+.pitch-points li { align-content: start; background: color-mix(in srgb, var(--ocre) 12%, var(--terre)); border-radius: 12px; padding: 10px 8px; display: grid; gap: 2px; text-align: center; min-width: 0; }
+.pitch-points b { font: 700 1rem var(--f-chiffres); text-transform: uppercase; letter-spacing: 0.06em; color: var(--ocre); }
+.pitch-points span { font-size: 0.82rem; line-height: 1.3; color: var(--sable); }
+.coureur { animation: foulee 0.5s ease-in-out infinite alternate; transform-origin: 148px 214px; }
+@keyframes foulee { from { transform: translateY(0); } to { transform: translateY(-2px); } }
+.choix button { background: linear-gradient(180deg, color-mix(in srgb, var(--terre) 85%, #4a2c16), var(--terre)); box-shadow: inset 0 1px 0 rgba(255,220,160,.06); }
+.choix button[aria-pressed="true"] { box-shadow: 0 0 0 1px var(--ocre), 0 6px 18px color-mix(in srgb, var(--ocre) 25%, transparent); }
+.choix button .ico { font-size: 1.6rem; line-height: 1; }
+.cta { background: linear-gradient(180deg, #f5b44c, #df6a2c); box-shadow: 0 8px 22px rgba(223,106,44,.35); }
+.ar { position: fixed; inset: 0; z-index: 7; background: #000; overflow: hidden; }
+.ar video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ar-fond { position: absolute; inset: 0; background: linear-gradient(#8a2e3b, #df6a2c 55%, #3b1810 56%, #160b07); }
+.ar-proie { position: absolute; top: 52%; left: 50%; width: 46vw; max-width: 260px; aspect-ratio: 1; transform: translate(-50%, -50%); filter: drop-shadow(0 8px 14px rgba(0,0,0,.6)); }
+.ar-proie svg { width: 100%; height: 100%; display: block; }
+.ar-viseur { position: absolute; top: 52%; left: 50%; width: 120px; height: 120px; margin: -60px 0 0 -60px; border: 3px solid rgba(255,240,207,.85); border-radius: 50%; box-shadow: 0 0 0 2000px rgba(0,0,0,.12); }
+.ar-viseur::before, .ar-viseur::after { content: ""; position: absolute; background: rgba(255,240,207,.85); }
+.ar-viseur::before { left: 50%; top: -14px; bottom: -14px; width: 2px; margin-left: -1px; }
+.ar-viseur::after { top: 50%; left: -14px; right: -14px; height: 2px; margin-top: -1px; }
+.ar-bas { position: absolute; left: 0; right: 0; bottom: 0; padding: 16px max(16px, env(safe-area-inset-right, 0px)) calc(20px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); display: grid; gap: 10px; background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,.75)); }
+.ar-txt { margin: 0; text-align: center; font: 700 1.2rem var(--f-texte); color: #fff0cf; text-shadow: 0 2px 8px #000; }
 .capture { position: fixed; inset: 0; z-index: 6; background: #000; }
 .capture.choc { animation: choc 1.6s ease-out forwards; }
 @keyframes choc { 0% { background: var(--danger); } 12% { background: #000; } 20% { background: var(--danger); } 100% { background: #000; } }
@@ -197,8 +232,61 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
 
 <section id="accueil">
 <main>
-  <header class="groupe">
-    <span class="kicker" id="kicker">Savannahrun · Prototype</span>
+  <div class="hero">
+    <svg class="paysage" viewBox="0 0 400 260" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <defs>
+        <linearGradient id="ciel-savane" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#231236"/><stop offset="0.42" stop-color="#8a2e3b"/>
+          <stop offset="0.72" stop-color="#df6a2c"/><stop offset="1" stop-color="#f5b44c"/>
+        </linearGradient>
+        <radialGradient id="halo-soleil"><stop offset="0" stop-color="#ffe8a8" stop-opacity="0.95"/><stop offset="1" stop-color="#ffb347" stop-opacity="0"/></radialGradient>
+      </defs>
+      <rect width="400" height="260" fill="url(#ciel-savane)"/>
+      <circle cx="292" cy="182" r="95" fill="url(#halo-soleil)" opacity="0.6"/>
+      <circle class="soleil" cx="292" cy="182" r="38" fill="#ffd77a"/>
+      <g class="oiseaux" stroke="#2b1322" stroke-width="1.6" fill="none" stroke-linecap="round">
+        <path d="M150 128 q6 -6 12 0 q6 -6 12 0"/><path d="M184 116 q4 -4 8 0 q4 -4 8 0"/><path d="M206 134 q5 -5 10 0 q5 -5 10 0"/>
+      </g>
+      <path d="M0 202 Q60 184 120 196 T240 190 T400 194 V260 H0Z" fill="#7d3423" opacity="0.85"/>
+      <path d="M0 216 Q80 206 160 214 T320 210 T400 214 V260 H0Z" fill="#3b1810"/>
+      <!-- grand acacia -->
+      <g fill="#160b07" stroke="#160b07" stroke-linecap="round">
+        <path d="M74 230 L76 186 L62 162 M76 186 L90 160 M76 196 L98 172" fill="none" stroke-width="5"/>
+        <ellipse cx="74" cy="156" rx="54" ry="9"/><ellipse cx="48" cy="161" rx="26" ry="7"/><ellipse cx="102" cy="157" rx="30" ry="8"/><ellipse cx="80" cy="149" rx="30" ry="6"/>
+      </g>
+      <!-- girafe au loin -->
+      <g fill="#160b07" stroke="#160b07" stroke-linecap="round">
+        <ellipse cx="200" cy="200" rx="12" ry="7"/>
+        <path d="M192 204 L191 220 M196 205 L196 220 M207 204 L208 220 M211 203 L213 220" fill="none" stroke-width="2.4"/>
+        <path d="M208 196 L222 166" fill="none" stroke-width="4.5"/>
+        <ellipse cx="226" cy="163" rx="6.5" ry="3.2" transform="rotate(-18 226 163)"/>
+        <path d="M222 160 L221 155 M225 159 L225 154 M188 198 L184 208" fill="none" stroke-width="1.4"/>
+      </g>
+      <!-- le coureur, au milieu des animaux -->
+      <g class="coureur" fill="#160b07" stroke="#160b07" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="150" cy="184" r="4.2"/>
+        <path d="M149 189 L144 204" fill="none" stroke-width="5"/>
+        <path d="M148 192 L156 197 L161 192 M148 192 L141 196 L136 202" fill="none" stroke-width="2.6"/>
+        <path d="M144 204 L153 211 L152 220 M144 204 L139 213 L131 214" fill="none" stroke-width="3"/>
+      </g>
+      <!-- petit acacia -->
+      <g fill="#160b07" stroke="#160b07" stroke-linecap="round">
+        <path d="M356 226 L357 200 L349 188 M357 200 L366 186" fill="none" stroke-width="3.5"/>
+        <ellipse cx="357" cy="184" rx="32" ry="6"/><ellipse cx="342" cy="187" rx="15" ry="4.5"/>
+      </g>
+      <path d="M0 260 L0 232 L6 218 L10 234 L16 212 L21 233 L27 222 L32 236 L38 214 L43 234 L50 224 L56 237 L62 216 L67 235 L74 226 L80 238 L86 218 L92 236 L99 227 L106 238 L112 220 L118 236 L126 228 L134 238 L140 222 L147 237 L155 229 L163 238 L170 218 L177 236 L186 228 L194 238 L201 222 L208 237 L216 230 L224 238 L231 218 L238 236 L246 228 L254 238 L261 220 L268 236 L276 229 L284 238 L291 217 L298 236 L306 227 L314 238 L321 221 L328 236 L336 228 L344 238 L351 219 L358 236 L366 229 L374 238 L381 216 L388 235 L394 226 L400 236 L400 260 Z" fill="#0d0704"/>
+    </svg>
+    <div class="hero-titre">
+      <span class="logo">Savannahrun</span>
+      <span class="slogan">Instinct de course</span>
+    </div>
+  </div>
+
+  <div class="pitch">
+    <p class="pitch-phrase">Le jeu de course où l'on court pour de vrai, comme un animal&nbsp;de&nbsp;la&nbsp;savane.</p>
+  </div>
+
+  <header class="groupe mode">
     <h1 id="titre">Gazelle traquée</h1>
     <p class="intro" id="intro">Un guépard vous suit à la trace et alterne traque et attaques. Creusez l'écart jusqu'à l'objectif pour le semer, ou tenez jusqu'au bout du chrono.</p>
   </header>
@@ -206,17 +294,17 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
   <div class="groupe">
     <span class="label">Jeu</span>
     <div class="choix" id="choix-jeu">
-      <button type="button" id="j-poursuite" data-jeu="poursuite" aria-pressed="true">Poursuite<small>semer ou rattraper</small></button>
-      <button type="button" id="j-ville" data-jeu="ville" aria-pressed="false">En ville<small>poursuite sur la carte</small></button>
-      <button type="button" id="j-eau" data-jeu="eau" aria-pressed="false">Point d'eau<small>arriver le premier</small></button>
+      <button type="button" id="j-poursuite" data-jeu="poursuite" aria-pressed="true"><span class="ico" aria-hidden="true">🌙</span>Poursuite<small>semer ou rattraper</small></button>
+      <button type="button" id="j-ville" data-jeu="ville" aria-pressed="false"><span class="ico" aria-hidden="true">🗺️</span>En ville<small>poursuite sur la carte</small></button>
+      <button type="button" id="j-eau" data-jeu="eau" aria-pressed="false"><span class="ico" aria-hidden="true">💧</span>Point d'eau<small>arriver le premier</small></button>
     </div>
   </div>
 
   <div class="groupe">
     <span class="label">Vous êtes</span>
     <div class="choix deux" id="choix-role">
-      <button type="button" id="r-gazelle" data-role="gazelle" aria-pressed="true">Gazelle<small>fuir le guépard</small></button>
-      <button type="button" id="r-guepard" data-role="guepard" aria-pressed="false">Guépard<small>chasser une proie</small></button>
+      <button type="button" id="r-gazelle" data-role="gazelle" aria-pressed="true"><span class="ico" aria-hidden="true">🦌</span>Gazelle<small>fuir le guépard</small></button>
+      <button type="button" id="r-guepard" data-role="guepard" aria-pressed="false"><span class="ico" aria-hidden="true">🐆</span>Guépard<small>chasser une proie</small></button>
     </div>
   </div>
 
@@ -464,6 +552,17 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
 
 <div class="compte" id="compte" hidden>3</div>
 <div class="capture" id="capture" hidden></div>
+<div class="ar" id="ar" hidden>
+  <video id="ar-video" playsinline muted autoplay></video>
+  <div class="ar-fond" id="ar-fond"></div>
+  <div class="ar-proie" id="ar-proie" aria-hidden="true"></div>
+  <div class="ar-viseur" id="ar-viseur" hidden></div>
+  <div class="ar-bas">
+    <p class="ar-txt" id="ar-txt">Elle est là… Levez le téléphone.</p>
+    <button class="cta" id="ar-ouvrir" type="button">Ouvrir les yeux du guépard</button>
+    <button class="cta" id="ar-bondir" type="button" hidden>Bondir !</button>
+  </div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
@@ -1741,6 +1840,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     const attaque = e.phase === 'attaque';
     let v = (attaque ? (e.ecoule - e.debutAttaque < 4 ? e.vAtt * 1.15 : e.vAtt) : e.vRepit) * e.forme;
     if (guepard() && !attaque) v *= 0.5;                       // la proie broute : elle avance doucement
+    if (e.ar) v *= 0.3;                                         // pendant la visée, elle bouge à peine
     if (e.ecoule >= e.prochainRecalcul) {
       e.prochainRecalcul = e.ecoule + (attaque ? 6 : 10);
       if (guepard()) {
@@ -1777,7 +1877,9 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     if (e.phase === 'traque' && e.finPhase - e.ecoule > 15 && Math.random() < dt / 70) signeAleatoire();
     // Fins de partie
     if (guepard()) {
-      if (d <= VILLE_CAPTURE) return terminer('proie');
+      // La capture se fait en réalité augmentée : c'est vous qui bondissez
+      gererAR(e, d);
+      if (!etat.enCours) return;
       if (d >= e.objectif) return terminer('echappee');
       if (e.ecoule >= e.duree) return terminer('nuit');
     } else {
@@ -1805,7 +1907,100 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     }
   }
 
+  // ---------- Attaque finale en réalité augmentée (mode En ville, rôle guépard) ----------
+  // À moins de 15 m, le jeu invite à lever le téléphone. La caméra s'ouvre, la gazelle apparaît
+  // dans la direction où elle se trouve (boussole). On vise, et c'est vous qui déclenchez le bond.
+  const AR_DISTANCE = 15, AR_FENETRE = 10, AR_INVITE = 8, AR_ANGLE = 12;
+  const ar = { flux: null, cap: null, decalage: 0, anim: null };
+  function capteurCap(ev) {
+    if (typeof ev.webkitCompassHeading === 'number') ar.cap = ev.webkitCompassHeading;     // iPhone
+    else if (ev.absolute && typeof ev.alpha === 'number') ar.cap = (360 - ev.alpha) % 360; // Android
+  }
+  function ouvrirInvitationAR() {
+    const e = etat;
+    e.ar = 'invite'; e.arDebut = e.ecoule;
+    $('ar').hidden = false; $('ar-video').hidden = true; $('ar-fond').hidden = false;
+    $('ar-proie').hidden = true; $('ar-viseur').hidden = true;
+    $('ar-ouvrir').hidden = false; $('ar-bondir').hidden = true;
+    $('ar-txt').textContent = 'Elle est là… Levez le téléphone.';
+    battement(true);
+    if (!instinct()) parler('Elle est là… Levez le téléphone.', true);
+  }
+  async function ouvrirVueAR() {
+    const e = etat;
+    if (e.ar !== 'invite') return;
+    // Autorisations demandées au toucher (obligatoire sur iPhone)
+    try { if (typeof DeviceOrientationEvent !== 'undefined' && DeviceOrientationEvent.requestPermission) await DeviceOrientationEvent.requestPermission(); } catch {}
+    window.addEventListener('deviceorientation', capteurCap);
+    window.addEventListener('deviceorientationabsolute', capteurCap);
+    try {
+      ar.flux = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+      $('ar-video').srcObject = ar.flux; $('ar-video').hidden = false; $('ar-fond').hidden = true;
+    } catch { ar.flux = null; }   // sans caméra : la gazelle sur un fond de savane
+    e.ar = 'vue'; e.arFin = e.ecoule + AR_FENETRE; ar.decalage = 0;
+    $('ar-proie').innerHTML = $('proie').innerHTML;
+    $('ar-proie').hidden = false; $('ar-viseur').hidden = false;
+    $('ar-ouvrir').hidden = true; $('ar-bondir').hidden = false;
+    $('ar-txt').textContent = 'Visez la gazelle, puis bondissez.';
+    animerAR();
+  }
+  // Où est la gazelle par rapport au centre de l'écran (en degrés) ?
+  function angleProie() {
+    const e = etat, t = performance.now() / 1000;
+    const zigzag = Math.sin(t * 1.7) * 6 + Math.sin(t * 0.6) * 4;   // elle ne tient pas en place
+    if (ar.cap === null) return Math.sin(t * 1.3) * 28 + zigzag;     // sans boussole : elle passe devant vous
+    let rel = cap(e.pos, e.adv.pos) - ar.cap + zigzag;
+    rel = ((rel + 540) % 360) - 180;
+    return rel;
+  }
+  function animerAR() {
+    const e = etat;
+    if (e.ar !== 'vue') return;
+    const a = angleProie(), d = haversine(e.pos, e.adv.pos);
+    ar.angle = a;
+    const x = 50 + a / 30 * 50;                                       // champ de vision d'environ 60°
+    const taille = Math.min(1.6, Math.max(0.5, 10 / Math.max(d, 4)));
+    const saut = Math.abs(Math.sin(performance.now() / 180)) * -10;
+    $('ar-proie').style.left = x + '%';
+    $('ar-proie').style.transform = `translate(-50%, calc(-50% + ${saut.toFixed(0)}px)) scale(${taille.toFixed(2)})`;
+    ar.anim = requestAnimationFrame(animerAR);
+  }
+  function fermerAR() {
+    cancelAnimationFrame(ar.anim);
+    window.removeEventListener('deviceorientation', capteurCap);
+    window.removeEventListener('deviceorientationabsolute', capteurCap);
+    if (ar.flux) { ar.flux.getTracks().forEach(t => t.stop()); ar.flux = null; }
+    $('ar-video').srcObject = null; $('ar').hidden = true; ar.cap = null;
+  }
+  function rateAR(message) {
+    const e = etat;
+    fermerAR();
+    e.ar = null; e.prochainAR = e.ecoule + 20;
+    // Raté : elle détale aussitôt
+    e.phase = 'alerte'; e.finPhase = e.ecoule; e.prochainRecalcul = 0;
+    ebrouement(); setTimeout(() => sabots(0.6), 200);
+    if (!instinct()) parler(message, true);
+  }
+  function bondir() {
+    const e = etat;
+    if (e.ar !== 'vue') return;
+    if (Math.abs(ar.angle) <= AR_ANGLE) { fermerAR(); e.ar = null; terminer('proie'); }
+    else rateAR(ar.angle < 0 ? 'Raté, trop à droite ! Elle s’enfuit.' : 'Raté, trop à gauche ! Elle s’enfuit.');
+  }
+  $('ar-ouvrir').addEventListener('click', ouvrirVueAR);
+  $('ar-bondir').addEventListener('click', bondir);
+  // Appelé à chaque pas de jeu : gère l'invitation, les délais et la fuite si on traîne
+  function gererAR(e, d) {
+    if (!e.ar) {
+      if (d < AR_DISTANCE && e.ecoule >= (e.prochainAR || 0)) ouvrirInvitationAR();
+      return;
+    }
+    if (e.ar === 'invite' && e.ecoule - e.arDebut > AR_INVITE) rateAR('Trop lent… Elle vous a senti.');
+    else if (e.ar === 'vue' && e.ecoule > e.arFin) rateAR('Trop lent… Elle vous a senti.');
+  }
+
   function terminer(issue) {
+    if (!$('ar').hidden) { fermerAR(); etat.ar = null; }
     const e = etat;
     e.enCours = false; clearInterval(horloge);
     const ecart = calcEcart(e);
