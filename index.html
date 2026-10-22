@@ -1623,6 +1623,8 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
         const cum = [0];
         for (let i = 1; i < ch.length; i++) cum.push(cum[i - 1] + haversine({ lat: ch[i - 1][0], lon: ch[i - 1][1] }, { lat: ch[i][0], lon: ch[i][1] }));
         ag.chemin = ch; ag.cumul = cum; ag.fait = 0;
+        // Écart entre la fin du chemin praticable et la cible : grand écart = cible derrière un obstacle (clôture, grille…)
+        ag.ecartFin = haversine({ lat: ch[ch.length - 1][0], lon: ch[ch.length - 1][1] }, cible);
       }
     }).catch(() => {}).finally(() => { ag.enCalcul = false; });
   }
@@ -1632,7 +1634,8 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
       const p = positionRival(ag);
       ag.pos = { lat: p[0], lon: p[1] };
     } else if (ag.cible) {
-      // Pas (encore) de chemin : tout droit vers sa cible
+      // Pas (encore) de chemin : tout droit vers sa cible. S'il n'y a pas de chemin praticable jusqu'au bout, il franchit l'obstacle.
+      ag.franchit = !!ag.chemin && ag.ecartFin > 15;
       const d = haversine(ag.pos, ag.cible);
       if (d > 1) ag.pos = destination(ag.pos, cap(ag.pos, ag.cible), Math.min(metres, d));
     }
@@ -1750,6 +1753,12 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     }
     avancerAgent(e.adv, v * dt);
     const d = haversine(e.pos, e.adv.pos);
+    // Gazelle cachée derrière une clôture : le guépard saute (une fois par minute au plus)
+    if (!guepard() && e.adv.franchit && d < 60 && e.ecoule >= (e.prochaineCloture || 0)) {
+      e.prochaineCloture = e.ecoule + 60;
+      feulement(0.8); setTimeout(impact, 300);
+      if (!instinct()) setTimeout(() => parler("Le guépard est un félin. Inutile de penser que cet obstacle l'arrêtera… Il a faim.", true), 900);
+    }
     // Mode guépard : trop près, la proie vous repère et s'enfuit plus tôt que prévu
     if (guepard() && e.phase === 'traque' && d < 60 && Math.random() < dt / 8) { e.finPhase = e.ecoule; e.prochainRecalcul = 0; }
     if (attaque && e.ecoule - e.debutAttaque < 0.3) e.prochainRecalcul = 0;   // nouvelle attaque : nouveau chemin aussitôt
