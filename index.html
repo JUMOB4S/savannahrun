@@ -162,7 +162,9 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
 .eau-vision.avec-carte .ligne-eau { color: var(--sable); }
 .eau-vision.avec-carte .aide { display: none; }
 .icone-joueur { width: 44px; height: 44px; display: grid; place-items: center; }
-.icone-joueur svg { width: 44px; height: 44px; filter: drop-shadow(0 2px 4px rgba(0,0,0,.6)); }
+.icone-joueur { position: relative; }
+.emoji-joueur { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); text-align: center; font-size: 20px; line-height: 1; pointer-events: none; }
+.icone-joueur svg { width: 50px; height: 50px; filter: drop-shadow(0 2px 4px rgba(0,0,0,.6)); }
 .icone-eau, .icone-rival { font-size: 28px; line-height: 1; text-align: center; filter: drop-shadow(0 2px 3px rgba(0,0,0,.6)); }
 .bilan-liste { display: grid; gap: 6px; margin: 4px 0 0; padding: 0; list-style: none; }
 .bilan-liste li { display: grid; grid-template-columns: 1.6em 1fr auto; gap: 8px; align-items: baseline; font-size: 0.92rem; border-top: 1px solid color-mix(in srgb, var(--poussiere) 25%, transparent); padding-top: 6px; }
@@ -209,6 +211,9 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
 .choix button[aria-pressed="true"] { box-shadow: 0 0 0 1px var(--ocre), 0 6px 18px color-mix(in srgb, var(--ocre) 25%, transparent); }
 .choix button .ico { font-size: 1.6rem; line-height: 1; }
 .cta { background: linear-gradient(180deg, #f5b44c, #df6a2c); box-shadow: 0 8px 22px rgba(223,106,44,.35); }
+.esq-guepard { position: absolute; top: 46%; left: 50%; width: 60vw; max-width: 320px; aspect-ratio: 1; transform: translate(-50%, -50%) scale(0.35); }
+.esq-guepard svg { width: 100%; height: 100%; display: block; }
+.esq-flash { position: absolute; inset: 0; background: rgba(255, 83, 64, .35); }
 .ar { position: fixed; inset: 0; z-index: 7; background: #000; overflow: hidden; }
 .ar video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .ar-fond { position: absolute; inset: 0; background: linear-gradient(#8a2e3b, #df6a2c 55%, #3b1810 56%, #160b07); }
@@ -220,6 +225,18 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
 .ar-viseur::after { top: 50%; left: -14px; right: -14px; height: 2px; margin-top: -1px; }
 .ar-bas { position: absolute; left: 0; right: 0; bottom: 0; padding: 16px max(16px, env(safe-area-inset-right, 0px)) calc(20px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); display: grid; gap: 10px; background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,.75)); }
 .ar-txt { margin: 0; text-align: center; font: 700 1.2rem var(--f-texte); color: #fff0cf; text-shadow: 0 2px 8px #000; }
+.niveaux { display: grid; gap: 12px; }
+.niv-ligne { display: grid; grid-template-columns: 2.2rem 1fr; gap: 10px; align-items: center; }
+.niv-ico { font-size: 1.7rem; text-align: center; }
+.niv-txt { display: grid; gap: 3px; min-width: 0; }
+.niv-txt b { font: 700 1.05rem var(--f-chiffres); color: var(--sable); }
+.niv-txt small { font: 500 0.8rem var(--f-chiffres); color: var(--poussiere); letter-spacing: 0.04em; }
+.niv-barre { height: 6px; border-radius: 99px; background: color-mix(in srgb, var(--poussiere) 25%, transparent); overflow: hidden; }
+.niv-barre i { display: block; height: 100%; background: var(--ocre); border-radius: 99px; }
+.trans-points { margin: 0; font: 700 1.3rem var(--f-chiffres); color: var(--ocre); }
+.trans-points small { display: block; font-size: 1rem; color: var(--sable); }
+.details-points { display: grid; gap: 2px; margin-top: 6px; font: 500 0.92rem var(--f-chiffres); color: var(--poussiere); }
+.details-points b { color: var(--sable); }
 .capture { position: fixed; inset: 0; z-index: 6; background: #000; }
 .capture.choc { animation: choc 1.6s ease-out forwards; }
 @keyframes choc { 0% { background: var(--danger); } 12% { background: #000; } 20% { background: var(--danger); } 100% { background: #000; } }
@@ -293,14 +310,14 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
 
   <div class="groupe">
     <span class="label">Jeu</span>
-    <div class="choix" id="choix-jeu">
-      <button type="button" id="j-poursuite" data-jeu="poursuite" aria-pressed="true"><span class="ico" aria-hidden="true">🌙</span>Poursuite<small>semer ou rattraper</small></button>
-      <button type="button" id="j-ville" data-jeu="ville" aria-pressed="false"><span class="ico" aria-hidden="true">🗺️</span>En ville<small>poursuite sur la carte</small></button>
+    <!-- La poursuite classique (sans carte) est mise de côté, gardée en idée : le code reste en place -->
+    <div class="choix deux" id="choix-jeu">
+      <button type="button" id="j-ville" data-jeu="ville" aria-pressed="true"><span class="ico" aria-hidden="true">🗺️</span>En ville<small>poursuite sur la carte</small></button>
       <button type="button" id="j-eau" data-jeu="eau" aria-pressed="false"><span class="ico" aria-hidden="true">💧</span>Point d'eau<small>arriver le premier</small></button>
     </div>
   </div>
 
-  <div class="groupe">
+  <div class="groupe" id="groupe-role">
     <span class="label">Vous êtes</span>
     <div class="choix deux" id="choix-role">
       <button type="button" id="r-gazelle" data-role="gazelle" aria-pressed="true"><span class="ico" aria-hidden="true">🦌</span>Gazelle<small>fuir le guépard</small></button>
@@ -331,6 +348,11 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
       <button type="button" id="m-gps" data-mode="gps" aria-pressed="true">Course réelle<small>GPS du téléphone</small></button>
       <button type="button" id="m-sim" data-mode="sim" aria-pressed="false">Simulation<small>tester sans courir</small></button>
     </div>
+  </div>
+
+  <div class="groupe profil">
+    <span class="label">Vos niveaux</span>
+    <div class="niveaux" id="niveaux"></div>
   </div>
 
   <div class="groupe profil">
@@ -523,6 +545,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
   <span class="kicker">Fin de la poursuite</span>
   <h2 id="trans-titre">Vous avez semé le guépard</h2>
   <p class="intro" id="trans-txt"></p>
+  <p class="trans-points" id="trans-points"></p>
   <span class="trans-compte" id="trans-compte">10</span>
   <p class="aide">Retour dans la savane… La prochaine partie commencera quand vous la lancerez.</p>
   <button class="secondaire" id="bilan-btn" type="button">Sortir de la savane et voir le bilan</button>
@@ -552,6 +575,19 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
 
 <div class="compte" id="compte" hidden>3</div>
 <div class="capture" id="capture" hidden></div>
+<div class="ar" id="esq" hidden>
+  <video id="esq-video" playsinline muted autoplay hidden></video>
+  <div class="ar-fond" id="esq-fond"></div>
+  <div class="esq-guepard" id="esq-guepard" aria-hidden="true"></div>
+  <div class="esq-flash" id="esq-flash" hidden></div>
+  <div class="ar-bas">
+    <p class="ar-txt" id="esq-txt">Il bondit ! Faites un crochet !</p>
+    <div class="actions">
+      <button class="cta" id="esq-gauche" type="button">⟵ Crochet</button>
+      <button class="cta" id="esq-droite" type="button">Crochet ⟶</button>
+    </div>
+  </div>
+</div>
 <div class="ar" id="ar" hidden>
   <video id="ar-video" playsinline muted autoplay></video>
   <div class="ar-fond" id="ar-fond"></div>
@@ -572,7 +608,11 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
   const montrer = nom => ecrans.forEach(e => $(e).hidden = e !== nom);
 
   // ---------- Réglages ----------
-  const reglages = { jeu: 'poursuite', role: 'gazelle', niveau: 'facile', minutes: 10, mode: 'gps', narrateur: 'discret' };
+  const reglages = { jeu: 'ville', role: 'gazelle', niveau: 'facile', minutes: 10, mode: 'gps', narrateur: 'discret' };
+  // En ville : départ à 100 m, fin à 200 m
+  const VILLE_DEPART = 100, VILLE_CAPTURE = 10;
+  const VILLE_MARGE = { gazelle: { facile: 100, inter: 100, legende: 100 }, guepard: { facile: 100, inter: 100, legende: 100 } };
+  const MULT = { facile: 1, inter: 1.5, legende: 2 };           // multiplicateur de points par difficulté
   const RIVAL_DIST = { facile: 1.3, inter: 1.1, legende: 0.9 };   // Point d'eau : distance du rival / la vôtre
   const RIVAL_TXT = { facile: 'animaux plus loin', inter: 'animaux un peu plus loin', legende: 'animaux plus près' };
   // Trois niveaux : chacun règle l'adversaire par rapport à votre propre rythme (kF au repos, kA en attaque)
@@ -630,8 +670,9 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     $('abandon').textContent = r.abandon;
     $('lab-attaques').textContent = r.labAttaques; $('lab-ecart').textContent = r.labEcart;
     $('vision').setAttribute('aria-label', r.vision);
-    document.querySelectorAll('#choix-role small').forEach(x => { x.hidden = reglages.jeu === 'eau'; });
-    Object.keys(NIVEAUX).forEach(n => { $('niv-' + n + '-txt').textContent = reglages.jeu === 'eau' ? RIVAL_TXT[n] : reglages.jeu === 'ville' ? r.nivTxt(VILLE_DEPART + VILLE_MARGE[reglages.role][n]) : r.nivTxt(NIVEAUX[n].dist[reglages.role]); });
+    $('groupe-role').hidden = reglages.jeu === 'eau';     // au point d'eau, tous les animaux ont soif : pas de rôle
+    const VITESSE_TXT = { facile: 'plus lent que vous', inter: 'même vitesse', legende: 'plus rapide' };
+    Object.keys(NIVEAUX).forEach(n => { $('niv-' + n + '-txt').textContent = (reglages.jeu === 'eau' ? RIVAL_TXT[n] : reglages.jeu === 'ville' ? VITESSE_TXT[n] : r.nivTxt(NIVEAUX[n].dist[reglages.role])); });
     majConseil();
     afficherRecord();
   }
@@ -655,6 +696,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
   const km = m => (m / 1000).toFixed(2).replace('.', ',');
   appliquerRole();
   setTimeout(afficherProfil, 0);
+  setTimeout(afficherNiveaux, 0);
 
   // ---------- Son : voix du narrateur ----------
   let ac = null, maitre = null, voixFr = null;
@@ -1062,6 +1104,122 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     const n = NIVEAUX[reglages.niveau], p = profil(), k = lire(cleAjust()) || 1;
     const v = p ? vTenable(p, dureeAttaque) * n.kA : 1000 / n.def[1];
     return Math.max(2, v) * k;
+  }
+
+  // ---------- Points et niveaux (solo) ----------
+  // Trois progressions séparées : carnivore (guépard en ville), herbivore (gazelle en ville), point d'eau.
+  // Niveaux 1 à 100 : on change d'animal tous les 10 niveaux.
+  const PALIERS = {
+    carnivore: ['Chacal', 'Hyène', 'Serval', 'Lycaon', 'Caracal', 'Léopard', 'Lion', 'Lionne', 'Guépard', 'Guépard royal'],
+    herbivore: ['Girafe', 'Buffle', 'Zèbre', 'Gnou', 'Oryx', 'Koudou', 'Impala', 'Gazelle', 'Springbok', 'Gazelle dorée'],
+    eau: ['Goutte', 'Flaque', 'Mare', 'Source', 'Ruisseau', 'Rivière', 'Lac', 'Fleuve', 'Delta', 'Oasis légendaire'],
+  };
+  const PISTES = [['carnivore', '🐆', 'Carnivore'], ['herbivore', '🦌', 'Herbivore'], ['eau', '💧', "Point d'eau"]];
+  // Points nécessaires pour passer du niveau n au suivant : 60, 66, 72… (les premiers niveaux vont vite)
+  function niveauDe(pts) {
+    let n = 1, reste = pts;
+    while (n < 100) { const c = 60 + 6 * (n - 1); if (reste < c) return { n, dans: reste, besoin: c }; reste -= c; n++; }
+    return { n: 100, dans: 1, besoin: 1 };
+  }
+  const animalDe = (piste, n) => PALIERS[piste][Math.min(9, Math.floor((n - 1) / 10))];
+  // Icône de chaque palier : l'emoji de l'animal quand il existe, sinon l'icône de la piste (en attendant des illustrations)
+  const EMOJIS = {
+    carnivore: ['🐾', '🐾', '🐾', '🐾', '🐾', '🐆', '🦁', '🦁', '🐆', '🐆'],   // 🐾 : pas d'emoji pour chacal, hyène, serval, lycaon, caracal
+    herbivore: ['🦒', '🐃', '🦓', '🦌', '🦌', '🦌', '🦌', '🦌', '🦌', '🦌'],
+    eau: ['💧', '💦', '💧', '⛲', '💧', '🏞️', '🏞️', '🌊', '🌊', '🌴'],
+  };
+  const emojiDe = (piste, n) => EMOJIS[piste][Math.min(9, Math.floor((n - 1) / 10))];
+  const niveauPiste = piste => niveauDe((lire('progression') || {})[piste] || 0).n;
+  const emojiJoueur = e => { const p = e.jeu === 'eau' ? 'eau' : e.role === 'guepard' ? 'carnivore' : 'herbivore'; return emojiDe(p, niveauPiste(p)); };
+  const titreNiveau = (piste, n) => `${animalDe(piste, n)} · niveau ${((n - 1) % 10) + 1}`;
+  const pisteDe = e => e.jeu === 'eau' ? 'eau' : e.role === 'guepard' ? 'carnivore' : 'herbivore';
+  // Base de la partie (avant bonus), selon l'issue
+  function pointsDeBase(e, issue, rang) {
+    switch (issue) {
+      case 'seme': case 'proie': return 50;
+      case 'survie': return 20;                                       // tenir jusqu'au bout sans être rattrapé
+      case 'eau-arrive': return [0, 50, 25, 10][rang] || 0;
+      case 'rendue': case 'abandon': return -15;                      // se rendre / abandonner coûte
+      case 'eau-abandon': return -10;
+    }
+    return 0;                                                         // rattrapé en luttant, proie échappée : neutre
+  }
+  const VICTOIRES = ['seme', 'proie'];
+  // Niveau conseillé pour chaque difficulté : Facile jusqu'au niveau 20, Intermédiaire de 20 à 60, Légende au-delà
+  const RANG_DIFF = { facile: 0, inter: 1, legende: 2 };
+  const rangConseille = n => n < 20 ? 0 : n < 60 ? 1 : 2;
+  // Exploits : des bonus ponctuels pour les beaux moments
+  function exploits(e, issue, rang) {
+    const l = [];
+    if (issue === 'seme' && e.frisson < 30) l.push(['Sueurs froides', 'semé après l’avoir senti à moins de 30 m', 15]);
+    if (issue === 'seme' && e.frisson >= 60) l.push(['Intouchable', 'jamais approché à moins de 60 m', 20]);
+    if (issue === 'proie' && e.arEssais === 1) l.push(['Du premier coup', 'bond réussi au premier essai', 20]);
+    if (issue === 'seme' && e.esquives) l.push(['Torero', 'semé après avoir esquivé son bond', 20]);
+    if (issue === 'proie' && e.ecoule < 180) l.push(['Éclair', 'capture en moins de 3 minutes', 15]);
+    if (issue === 'eau-arrive' && rang === 1) {
+      const plusProche = Math.min(...e.rivaux.filter(r => !r.arrive).map(r => r.dist - r.fait));
+      if (plusProche >= 150) l.push(['Seul au monde', 'premier avec 150 m d’avance sur tous', 20]);
+    }
+    if (issue === 'eau-arrive' && rang === 1 && e.dernierAMiCourse) l.push(['Remontée', 'dernier à mi-course, premier à l’eau', 25]);
+    return l;
+  }
+  function attribuerPoints(e, issue, rang) {
+    const piste = pisteDe(e), prog = lire('progression') || {};
+    const series = prog.series || {}, avant = prog[piste] || 0, nAvant = niveauDe(avant).n;
+    const m = MULT[e.niveau] || 1, base = pointsDeBase(e, issue, rang), details = [];
+    let pts = Math.round(base * m);
+    if (base > 0) {
+      details.push([`Difficulté ×${String(m).replace('.', ',')}`, Math.round(base * m)]);
+      // Défi : au-dessus de votre niveau conseillé, bonus ; en dessous, moins de points
+      const ecartDefi = RANG_DIFF[e.niveau] - rangConseille(nAvant);
+      if (ecartDefi) {
+        const b = Math.round(pts * 0.25 * ecartDefi);
+        details.push([ecartDefi > 0 ? 'Défi au-dessus de votre niveau' : 'Difficulté sous votre niveau', b]); pts += b;
+      }
+      // Série : chaque victoire d'affilée ajoute 10 % (jusqu'à +50 %)
+      const victoire = VICTOIRES.includes(issue) || (issue === 'eau-arrive' && rang === 1);
+      const serie = victoire ? (series[piste] || 0) + 1 : series[piste] || 0;
+      if (victoire && serie > 1) { const b = Math.round(pts * Math.min(0.5, 0.1 * (serie - 1))); details.push([`Série de ${serie} victoires`, b]); pts += b; }
+      e.serie = victoire ? serie : 0;
+    } else {
+      if (base < 0) { pts = Math.round(base * m); details.push([issue === 'rendue' ? 'Reddition' : 'Abandon', pts]); }
+      e.serie = 0;
+    }
+    if (issue === 'survie') e.serie = series[piste] || 0;            // tenir jusqu'au bout ne casse pas la série
+    exploits(e, issue, rang).forEach(([nom, , b]) => { details.push([`Exploit : ${nom}`, b]); pts += b; });
+    const course = Math.floor(e.distance / 100);                     // +1 point par 100 m courus
+    if (course) { details.push(['Distance courue', course]); pts += course; }
+    const apres = Math.max(0, avant + pts);
+    e.gain = { piste, pts, details, niveau: nAvant };
+    session.points = (session.points || 0) + pts;
+    // En simulation, les points sont calculés mais pas enregistrés (pas de niveaux gagnés sans courir)
+    if (e.mode === 'sim') { e.gain.sim = true; return; }
+    series[piste] = e.serie; prog.series = series; prog[piste] = apres; ecrire('progression', prog);
+    const nB = niveauDe(apres).n;
+    Object.assign(e.gain, { niveau: nB, monte: nB > nAvant, nouvelAnimal: nB > nAvant && animalDe(piste, nB) !== animalDe(piste, nAvant) });
+  }
+  function fanfare() {
+    if (!ac) return;
+    const t = ac.currentTime;
+    [523, 659, 784, 1047].forEach((f, i) => {
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = 'triangle'; o.frequency.value = f;
+      enveloppe(g, t + i * 0.12, 0.25, 0.01, 0.3);
+      o.connect(g).connect(maitre); o.start(t + i * 0.12); o.stop(t + i * 0.12 + 0.35);
+    });
+  }
+  function afficherNiveaux() {
+    const prog = lire('progression') || {};
+    $('niveaux').innerHTML = PISTES.map(([p, ico, nom]) => {
+      const nv = niveauDe(prog[p] || 0);
+      return `<div class="niv-ligne"><span class="niv-ico" aria-hidden="true">${emojiDe(p, nv.n)}</span>
+        <div class="niv-txt"><b>${titreNiveau(p, nv.n)}</b><small>${nom} · niveau ${nv.n} / 100 · ${prog[p] || 0} pts</small>
+        <div class="niv-barre"><i style="width:${Math.round(nv.dans / nv.besoin * 100)}%"></i></div></div></div>`;
+    }).join('');
+    // Les boutons de rôle prennent l'animal (nom et icône) de votre niveau
+    const nH = niveauPiste('herbivore'), nC = niveauPiste('carnivore');
+    $('r-gazelle').innerHTML = `<span class="ico" aria-hidden="true">${emojiDe('herbivore', nH)}</span>${animalDe('herbivore', nH)}<small>herbivore · fuir le guépard</small>`;
+    $('r-guepard').innerHTML = `<span class="ico" aria-hidden="true">${emojiDe('carnivore', nC)}</span>${animalDe('carnivore', nC)}<small>carnivore · chasser une proie</small>`;
   }
 
   // ---------- Écran allumé ----------
@@ -1472,7 +1630,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     coucheJeu = L.layerGroup().addTo(carte);
     e.mEau = L.marker([e.eau.lat, e.eau.lon], { icon: icone('💧', 'icone-eau', 32) }).addTo(coucheJeu);
     e.rivaux.forEach(r => { r.marqueur = L.marker(positionRival(r), { icon: icone(r.emoji, 'icone-rival', 32) }).addTo(coucheJeu); });
-    e.mJoueur = L.marker([e.pos.lat, e.pos.lon], { icon: icone('<svg viewBox="0 0 100 100" id="fleche-carte"><circle cx="50" cy="50" r="22" fill="#2b6fd6" stroke="#fff" stroke-width="6"/><path d="M50 2 L66 34 L50 27 L34 34 Z" fill="#2b6fd6" stroke="#fff" stroke-width="4"/></svg>', 'icone-joueur', 44), zIndexOffset: 1000 }).addTo(coucheJeu);
+    e.mJoueur = L.marker([e.pos.lat, e.pos.lon], { icon: icone('<svg viewBox="0 0 100 100" id="fleche-carte"><circle cx="50" cy="50" r="26" fill="#2b6fd6" stroke="#fff" stroke-width="6"/><path d="M50 2 L66 30 L50 24 L34 30 Z" fill="#2b6fd6" stroke="#fff" stroke-width="4"/></svg><span class="emoji-joueur">' + emojiJoueur(etat) + '</span>', 'icone-joueur', 50), zIndexOffset: 1000 }).addTo(coucheJeu);
     setTimeout(() => { carte.invalidateSize(); cadrer(true); }, 50);
   }
   function cadrer(immediat) {
@@ -1611,6 +1769,8 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     }
     e.trace.push({ t: e.ecoule, d: e.distance });
     const reste = haversine(e.pos, e.eau);
+    // À mi-course : étiez-vous dernier ? (pour l'exploit « Remontée »)
+    if (!e.miCourseVue && 1 - reste / e.depDist >= 0.5) { e.miCourseVue = true; e.dernierAMiCourse = e.rivaux.every(r => r.fait / r.dist > 0.5); }
     // Chaque animal avance sur ses rues ; à son arrivée, il boit
     e.rivaux.forEach(r => {
       if (r.arrive) return;
@@ -1695,8 +1855,9 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
       const ca = `ajust-eau-${e.niveau}`; ecrire(ca, Math.min(1.15, Math.max(0.85, (lire(ca) || 1) * (rang === 1 ? 1.03 : 0.97))));
     }
     apprendre(e);
+    attribuerPoints(e, issue, typeof rang === 'undefined' ? 0 : rang);
     session.parties++; if (victoire) session.victoires++;
-    session.liste.push({ titre: $('verdict-titre').textContent, victoire, jeu: e.jeu === 'eau' ? "Point d'eau" : e.jeu === 'ville' ? 'En ville' : 'Poursuite', role: e.role === 'guepard' ? 'Guépard' : 'Gazelle', dist: e.distance, temps: e.ecoule });
+    session.liste.push({ titre: $('verdict-titre').textContent, victoire, jeu: e.jeu === 'eau' ? "Point d'eau" : e.jeu === 'ville' ? 'En ville' : 'Poursuite', role: e.jeu === 'eau' ? '' : e.role === 'guepard' ? 'Guépard' : 'Gazelle', dist: e.distance, temps: e.ecoule, pts: e.gain ? e.gain.pts : 0, ico: emojiJoueur(e) });
     session.dist += e.distance + e.distExplo; session.temps += e.ecoule + e.tempsExplo;
     setTimeout(lancerTransition, 1500);
   }
@@ -1709,8 +1870,6 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
   // L'adversaire apparaît au moment où la partie commence, à 100 m, et reste toujours visible sur la carte.
   // Gazelle : le guépard vous traque, devine où vous allez et tente des raccourcis ; il est semé à 200 m.
   // Guépard : la proie broute, puis fuit sans prévenir, ou si vous approchez trop.
-  const VILLE_DEPART = 100, VILLE_CAPTURE = 10;
-  const VILLE_MARGE = { gazelle: { facile: 100, inter: 100, legende: 100 }, guepard: { facile: 100, inter: 100, legende: 100 } };
 
   function agentVers(ag, cible) {
     // (Re)calcule le chemin de l'animal par les rues ; en attendant, il continue sur son élan
@@ -1786,7 +1945,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     if (coucheJeu) coucheJeu.remove();
     coucheJeu = L.layerGroup().addTo(carte);
     e.mAdv = L.marker([e.adv.pos.lat, e.adv.pos.lon], { icon: icone(guepard() ? '🦌' : '🐆', 'icone-rival', 36) });
-    e.mJoueur = L.marker([e.pos.lat, e.pos.lon], { icon: icone('<svg viewBox="0 0 100 100" id="fleche-carte"><circle cx="50" cy="50" r="22" fill="#2b6fd6" stroke="#fff" stroke-width="6"/><path d="M50 2 L66 34 L50 27 L34 34 Z" fill="#2b6fd6" stroke="#fff" stroke-width="4"/></svg>', 'icone-joueur', 44), zIndexOffset: 1000 }).addTo(coucheJeu);
+    e.mJoueur = L.marker([e.pos.lat, e.pos.lon], { icon: icone('<svg viewBox="0 0 100 100" id="fleche-carte"><circle cx="50" cy="50" r="26" fill="#2b6fd6" stroke="#fff" stroke-width="6"/><path d="M50 2 L66 30 L50 24 L34 30 Z" fill="#2b6fd6" stroke="#fff" stroke-width="4"/></svg><span class="emoji-joueur">' + emojiJoueur(etat) + '</span>', 'icone-joueur', 50), zIndexOffset: 1000 }).addTo(coucheJeu);
     setTimeout(() => { carte.invalidateSize(); cadrerVille(true); }, 50);
   }
   // L'adversaire surgit à 100 m de vous, dans une direction au hasard, puis se raccroche aux rues
@@ -1820,6 +1979,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
 
   function bouclePasVille(dt) {
     const e = etat;
+    if (e.esquive) return;                                      // pendant l'esquive, le temps est suspendu
     e.ecoule += dt;
     if (e.ecoule >= e.finPhase) phaseSuivante();
     const dAvant = haversine(e.pos, e.adv.pos);
@@ -1841,6 +2001,8 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     let v = (attaque ? (e.ecoule - e.debutAttaque < 4 ? e.vAtt * 1.15 : e.vAtt) : e.vRepit) * e.forme;
     if (guepard() && !attaque) v *= 0.5;                       // la proie broute : elle avance doucement
     if (e.ar) v *= 0.3;                                         // pendant la visée, elle bouge à peine
+    if (e.ecoule < (e.fuiteBondJusqu || 0)) v = e.vAtt * 1.5;   // après un bond raté : sursaut de fuite
+    if (e.ecoule < (e.etourdiJusqu || 0)) v = 0;                // après une esquive : il se relève
     if (e.ecoule >= e.prochainRecalcul) {
       e.prochainRecalcul = e.ecoule + (attaque ? 6 : 10);
       if (guepard()) {
@@ -1883,7 +2045,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
       if (d >= e.objectif) return terminer('echappee');
       if (e.ecoule >= e.duree) return terminer('nuit');
     } else {
-      if (d <= VILLE_CAPTURE) return terminer('attrapee');
+      if (d <= 12) return lancerEsquive();                     // il bondit : dernière chance, l'esquive
       if (d >= e.objectif) return terminer('seme');
       if (e.ecoule >= e.duree) return terminer('survie');
     }
@@ -1910,7 +2072,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
   // ---------- Attaque finale en réalité augmentée (mode En ville, rôle guépard) ----------
   // À moins de 15 m, le jeu invite à lever le téléphone. La caméra s'ouvre, la gazelle apparaît
   // dans la direction où elle se trouve (boussole). On vise, et c'est vous qui déclenchez le bond.
-  const AR_DISTANCE = 15, AR_FENETRE = 10, AR_INVITE = 8, AR_ANGLE = 12;
+  const AR_DISTANCE = 15, AR_FENETRE = 10, AR_INVITE = 8, AR_ANGLE = 7;
   const ar = { flux: null, cap: null, decalage: 0, anim: null };
   function capteurCap(ev) {
     if (typeof ev.webkitCompassHeading === 'number') ar.cap = ev.webkitCompassHeading;     // iPhone
@@ -1938,7 +2100,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
       $('ar-video').srcObject = ar.flux; $('ar-video').hidden = false; $('ar-fond').hidden = true;
     } catch { ar.flux = null; }   // sans caméra : la gazelle sur un fond de savane
     e.ar = 'vue'; e.arFin = e.ecoule + AR_FENETRE; ar.decalage = 0;
-    $('ar-proie').innerHTML = $('proie').innerHTML;
+    $('ar-proie').innerHTML = copieDessin('proie', 'ar');
     $('ar-proie').hidden = false; $('ar-viseur').hidden = false;
     $('ar-ouvrir').hidden = true; $('ar-bondir').hidden = false;
     $('ar-txt').textContent = 'Visez la gazelle, puis bondissez.';
@@ -1947,8 +2109,9 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
   // Où est la gazelle par rapport au centre de l'écran (en degrés) ?
   function angleProie() {
     const e = etat, t = performance.now() / 1000;
-    const zigzag = Math.sin(t * 1.7) * 6 + Math.sin(t * 0.6) * 4;   // elle ne tient pas en place
-    if (ar.cap === null) return Math.sin(t * 1.3) * 28 + zigzag;     // sans boussole : elle passe devant vous
+    // Elle ne tient pas en place : écarts brusques et rapides, difficiles à anticiper
+    const zigzag = Math.sin(t * 3.1) * 9 + Math.sin(t * 1.15) * 7 + Math.sin(t * 5.3) * 3;
+    if (ar.cap === null) return Math.sin(t * 2.4) * 30 + zigzag;     // sans boussole : elle passe devant vous
     let rel = cap(e.pos, e.adv.pos) - ar.cap + zigzag;
     rel = ((rel + 540) % 360) - 180;
     return rel;
@@ -1975,15 +2138,17 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
   function rateAR(message) {
     const e = etat;
     fermerAR();
-    e.ar = null; e.prochainAR = e.ecoule + 20;
-    // Raté : elle détale aussitôt
+    // Raté : elle détale aussitôt, avec un sursaut d'avance ; il faut la rattraper pour retenter
+    e.ar = null; e.prochainAR = e.ecoule + 6; e.fuiteBondJusqu = e.ecoule + 6;
     e.phase = 'alerte'; e.finPhase = e.ecoule; e.prochainRecalcul = 0;
+    $('eau-nom').textContent = "Elle s'enfuit ! Rattrapez-la"; setTimeout(() => { if (etat.jeu === 'ville') $('eau-nom').textContent = 'Chasse en ville'; }, 5000);
     ebrouement(); setTimeout(() => sabots(0.6), 200);
     if (!instinct()) parler(message, true);
   }
   function bondir() {
     const e = etat;
     if (e.ar !== 'vue') return;
+    e.arEssais = (e.arEssais || 0) + 1;
     if (Math.abs(ar.angle) <= AR_ANGLE) { fermerAR(); e.ar = null; terminer('proie'); }
     else rateAR(ar.angle < 0 ? 'Raté, trop à droite ! Elle s’enfuit.' : 'Raté, trop à gauche ! Elle s’enfuit.');
   }
@@ -1992,6 +2157,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
   // Appelé à chaque pas de jeu : gère l'invitation, les délais et la fuite si on traîne
   function gererAR(e, d) {
     if (!e.ar) {
+      // Nouvelle chance 6 s après un raté, si vous êtes resté dans sa foulée
       if (d < AR_DISTANCE && e.ecoule >= (e.prochainAR || 0)) ouvrirInvitationAR();
       return;
     }
@@ -1999,8 +2165,88 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     else if (e.ar === 'vue' && e.ecoule > e.arFin) rateAR('Trop lent… Elle vous a senti.');
   }
 
+  // ---------- L'esquive (mode En ville, rôle gazelle) ----------
+  // Quand le guépard arrive sur vous, il bondit : faites un crochet au bon moment, du bon côté.
+  // Il se penche d'un côté juste avant de sauter : esquivez de l'autre côté, pendant le saut.
+  const esq = { flux: null, anim: null };
+  // Copie d'un dessin avec ses propres identifiants (dégradés, découpes), sinon il s'affiche mal hors de sa place d'origine
+  const copieDessin = (id, suffixe) => $(id).innerHTML.replace(/id="([^"]+)"/g, `id="$1-${suffixe}"`).replace(/url\(#([^)]+)\)/g, `url(#$1-${suffixe})`);
+  async function camera(video) {
+    try {
+      const flux = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+      video.srcObject = flux; video.hidden = false; return flux;
+    } catch { video.hidden = true; return null; }
+  }
+  function lancerEsquive() {
+    const e = etat;
+    e.esquive = true;
+    $('esq').hidden = false; $('esq-flash').hidden = true; $('esq-fond').hidden = false;
+    $('esq-guepard').innerHTML = copieDessin('tete', 'esq');
+    $('esq-guepard').querySelectorAll('rect').forEach(r => { if (r.id.startsWith('ombre')) r.setAttribute('opacity', '0'); });   // en pleine lumière
+    $('esq-txt').textContent = 'Il bondit ! Faites un crochet !';
+    camera($('esq-video')).then(f => { esq.flux = f; if (f) $('esq-fond').hidden = true; });
+    // Saut entre 1,6 et 3 s ; il se penche 0,6 s avant ; fenêtre d'esquive : de 0,15 s avant à 0,35 s après le saut
+    esq.t0 = performance.now(); esq.saut = 1.6 + Math.random() * 1.4; esq.cote = Math.random() < 0.5 ? -1 : 1; esq.fini = false;
+    feulement(0.6); battement(true);
+    if (!instinct()) parler('Il bondit !', true);
+    animerEsquive();
+  }
+  function animerEsquive() {
+    if (esq.fini) return;
+    const t = (performance.now() - esq.t0) / 1000;
+    const avance = Math.min(1, t / esq.saut);
+    let x = 50 + Math.sin(t * 7) * 3, s = 0.35 + avance * 1.1, y = 0;
+    if (t > esq.saut - 0.6) x += esq.cote * 16 * Math.min(1, (t - (esq.saut - 0.6)) / 0.4);   // il se penche
+    if (t >= esq.saut) {                                                                         // il saute
+      if ($('esq-flash').hidden) { $('esq-flash').hidden = false; impact(); }
+      s = 1.45 + (t - esq.saut) * 4; y = -20;
+    }
+    if (t > esq.saut + 0.35) return finEsquive(false, 'Trop tard…');
+    $('esq-guepard').style.left = x + '%';
+    $('esq-guepard').style.transform = `translate(-50%, calc(-50% + ${y}px)) scale(${s.toFixed(2)})`;
+    esq.anim = requestAnimationFrame(animerEsquive);
+  }
+  function crochet(dir) {
+    if (esq.fini || !etat.esquive) return;
+    const t = (performance.now() - esq.t0) / 1000;
+    if (t < esq.saut - 0.15) return finEsquive(false, 'Trop tôt ! Il a corrigé sa trajectoire.');
+    if (dir === esq.cote) return finEsquive(false, 'Du mauvais côté !');
+    finEsquive(true);
+  }
+  function fermerEsquive() {
+    esq.fini = true; cancelAnimationFrame(esq.anim);
+    if (esq.flux) { esq.flux.getTracks().forEach(t => t.stop()); esq.flux = null; }
+    $('esq-video').srcObject = null; $('esq').hidden = true;
+  }
+  function finEsquive(reussie, message) {
+    const e = etat;
+    if (esq.fini) return;
+    fermerEsquive();
+    e.esquive = false;
+    if (!reussie) { if (!instinct() && message) parler(message, true); return terminer('attrapee'); }
+    // Réussie : il vous manque, roule dans la poussière ; vous gagnez du terrain et un répit
+    e.esquives = (e.esquives || 0) + 1;
+    const c = cap(e.pos, e.adv.pos);
+    e.adv.pos = destination(e.pos, c, 35); e.adv.chemin = null; e.adv.cible = null;
+    e.etourdiJusqu = e.ecoule + 4; e.prochainRecalcul = e.ecoule + 4;
+    e.phase = 'traque'; e.finPhase = e.ecoule + 20 + Math.random() * 30;
+    grondement(1.4, 0.8);
+    if (!instinct()) parler('Esquivé ! Il roule dans la poussière.', true);
+  }
+  $('esq-gauche').addEventListener('click', () => crochet(-1));
+  $('esq-droite').addEventListener('click', () => crochet(1));
+  // Glisser le doigt marche aussi
+  let esqX = null;
+  $('esq').addEventListener('touchstart', ev => { esqX = ev.touches[0].clientX; }, { passive: true });
+  $('esq').addEventListener('touchend', ev => {
+    if (esqX === null) return;
+    const dx = ev.changedTouches[0].clientX - esqX; esqX = null;
+    if (Math.abs(dx) > 40) crochet(dx < 0 ? -1 : 1);
+  }, { passive: true });
+
   function terminer(issue) {
     if (!$('ar').hidden) { fermerAR(); etat.ar = null; }
+    if (!$('esq').hidden) { fermerEsquive(); etat.esquive = false; }
     const e = etat;
     e.enCours = false; clearInterval(horloge);
     const ecart = calcEcart(e);
@@ -2053,8 +2299,9 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
       ecrire(ca, Math.min(1.15, Math.max(0.85, (lire(ca) || 1) * (victoire ? 1.03 : 0.97))));
     }
     apprendre(e);
+    attribuerPoints(e, issue, typeof rang === 'undefined' ? 0 : rang);
     session.parties++; if (victoire) session.victoires++;
-    session.liste.push({ titre: $('verdict-titre').textContent, victoire, jeu: e.jeu === 'eau' ? "Point d'eau" : e.jeu === 'ville' ? 'En ville' : 'Poursuite', role: e.role === 'guepard' ? 'Guépard' : 'Gazelle', dist: e.distance, temps: e.ecoule });
+    session.liste.push({ titre: $('verdict-titre').textContent, victoire, jeu: e.jeu === 'eau' ? "Point d'eau" : e.jeu === 'ville' ? 'En ville' : 'Poursuite', role: e.jeu === 'eau' ? '' : e.role === 'guepard' ? 'Guépard' : 'Gazelle', dist: e.distance, temps: e.ecoule, pts: e.gain ? e.gain.pts : 0, ico: emojiJoueur(e) });
     session.dist += e.distance + e.distExplo; session.temps += e.ecoule + e.tempsExplo;
     const cle = e.role === 'guepard' ? 'guepard-stats' : 'gazelle-stats';
     const s = lire(cle) || { parties: 0, victoires: 0 };
@@ -2071,6 +2318,13 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
   function lancerTransition() {
     $('trans-titre').textContent = $('verdict-titre').textContent;
     $('trans-txt').textContent = $('verdict-txt').textContent;
+    const g = etat.gain;
+    if (g) {
+      $('trans-points').innerHTML = `${g.pts >= 0 ? '+' : ''}${g.pts} points`
+        + `<span class="details-points">${g.details.map(([n, v]) => `<span>${n} <b>${v >= 0 ? '+' : ''}${v}</b></span>`).join('')}</span>`
+        + (g.sim ? '<small>Simulation : points non comptés</small>' : g.nouvelAnimal ? `<small>${emojiDe(g.piste, g.niveau)} Vous devenez ${animalDe(g.piste, g.niveau)} !</small>` : g.monte ? `<small>${emojiDe(g.piste, g.niveau)} Niveau ${g.niveau} : ${titreNiveau(g.piste, g.niveau)}</small>` : '');
+      if (g.monte) setTimeout(fanfare, 400);
+    } else $('trans-points').textContent = '';
     $('trans-ecran').className = 'transition-ecran ' + ($('verdict').classList.contains('gagne') ? 'gagne' : 'perdu');
     montrer('transition');
     let n = 10; $('trans-compte').textContent = n;
@@ -2083,9 +2337,9 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
   function afficherBilan() {
     const s = session;
     $('bilan-session').innerHTML = `<span class="label">Votre passage dans la savane</span>
-      <span><b>${s.parties}</b> partie${s.parties > 1 ? 's' : ''} · <b>${s.victoires}</b> victoire${s.victoires > 1 ? 's' : ''}</span>
+      <span><b>${s.parties}</b> partie${s.parties > 1 ? 's' : ''} · <b>${s.victoires}</b> victoire${s.victoires > 1 ? 's' : ''} · <b>${(s.points || 0) >= 0 ? '+' : ''}${s.points || 0}</b> points</span>
       <span><b>${km(s.dist)}</b> km en <b>${mmss(s.temps)}</b>${s.temps > 60 && s.dist > 100 ? ` · allure moyenne <b>${allure(s.dist / s.temps)}</b> /km` : ''}</span>
-      <ol class="bilan-liste">${s.liste.map((p, i) => `<li><small>${i + 1}.</small><span class="${p.victoire ? 'ok' : 'ko'}">${p.titre}<br><small>${p.jeu} · ${p.role}</small></span><small>${km(p.dist)} km<br>${mmss(p.temps)}</small></li>`).join('')}</ol>`;
+      <ol class="bilan-liste">${s.liste.map((p, i) => `<li><small>${p.ico || (i + 1) + '.'}</small><span class="${p.victoire ? 'ok' : 'ko'}">${p.titre}<br><small>${p.jeu}${p.role ? ' · ' + p.role : ''}</small></span><small>${km(p.dist)} km · ${mmss(p.temps)}<br>${p.pts >= 0 ? '+' : ''}${p.pts} pts</small></li>`).join('')}</ol>`;
   }
   $('bilan-btn').addEventListener('click', () => {
     clearInterval(minuteurTrans); arreterGps();
@@ -2109,6 +2363,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
       finirExploration(); lancerDecompteEau();
     } else if (etat.jeu === 'ville') {
       $('lancer').disabled = true; $('lancer').textContent = guepard() ? 'La proie arrive…' : 'Le guépard prend position…';
+      if (etat.mode !== 'sim') { try { const f = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); f.getTracks().forEach(t => t.stop()); } catch {} }
       await preparerVille();
       finirExploration(); lancerDecompteVille();
     } else { finirExploration(); lancerDecompte(); }
@@ -2168,7 +2423,7 @@ button:focus-visible { outline: 3px solid var(--sable); outline-offset: 2px; }
     if (etat.mode !== 'sim') { demarrerGps(); signalPret = true; }
     lancerExploration();
   });
-  $('accueil-btn').addEventListener('click', () => { remettreAZero(); afficherRecord(); montrer('accueil'); });
+  $('accueil-btn').addEventListener('click', () => { remettreAZero(); afficherRecord(); afficherNiveaux(); montrer('accueil'); });
 })();
 </script>
 
